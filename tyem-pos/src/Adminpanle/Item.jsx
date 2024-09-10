@@ -5,7 +5,7 @@ import Sidebar from "./Sidebar"; // Import your Sidebar component
 import Modal from "react-modal";
 import AddCategory from "./AddCategory"; // Import the AddCategory component
 import axios from "axios";
-import { AiFillFileExcel } from 'react-icons/ai';
+import { AiFillFileExcel } from "react-icons/ai";
 
 Modal.setAppElement("#root");
 
@@ -22,7 +22,6 @@ const Item = () => {
     setOpenSidebarToggle(!openSidebarToggle);
   };
 
-  
   const openItemModal = () => {
     setItemModalIsOpen(true);
   };
@@ -61,19 +60,16 @@ const Item = () => {
     // setItems(data);
   };
 
-
   useEffect(() => {
-    axios.get('https://tyem.invenro.site/api/user/ExcelItems') // Adjust your API endpoint
+    axios
+      .get("https://tyem.invenro.site/api/user/ExcelItems") // Adjust your API endpoint
       .then((response) => {
         setItems(response.data);
       })
       .catch((error) => {
-        console.error('There was an error fetching the items!', error);
+        console.error("There was an error fetching the items!", error);
       });
   }, []);
-
-
-
 
   useEffect(() => {
     if (itemModalIsOpen) {
@@ -139,8 +135,8 @@ const Item = () => {
               <AiFillFileExcel
                 className="mr-2"
                 size={20}
-                style={{ color: 'gray' }}
-              /> 
+                style={{ color: "gray" }}
+              />
               Import Excel
             </button>
           </div>
@@ -175,66 +171,73 @@ const Item = () => {
       >
         <h2>Create Item</h2>
         <form>
+          {/* Title Field */}
           <div className="mb-4">
-            <label className="block text-gray-700">Name *</label>
+            <label className="block text-gray-700">Title *</label>
             <input
               type="text"
               className="p-2 border rounded w-full"
-              placeholder="Item Name"
-            />
-          </div>
-
-          <div className="mb-4">
-            <label className="block text-gray-700">Category *</label>
-            <select
-              className="p-2 border rounded w-full"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              placeholder="Item Title"
               required
-            >
-              <option value="">Select Category</option>
-              {categories.map((cat) => (
-                <option key={cat._id} value={cat._id}>
-                  {cat.categoryName}
-                </option>
-              ))}
-            </select>
+            />
           </div>
 
+          {/* Description Field */}
           <div className="mb-4">
-            <label className="block text-gray-700">Alternate Name</label>
-            <input
-              type="text"
-              className="p-2 border rounded w-full"
-              placeholder="Alternate Name"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Brand</label>
-            <select className="p-2 border rounded w-full">
-              <option>Select Brand</option>
-              {/* Add brands here */}
-            </select>
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Position</label>
-            <input
-              type="text"
-              className="p-2 border rounded w-full"
-              placeholder="Position"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700">Description</label>
+            <label className="block text-gray-700">Description *</label>
             <textarea
               className="p-2 border rounded w-full"
-              placeholder="Enter a description of this item. Describe details like features, options and measurements."
+              placeholder="Enter a detailed description of the item."
+              required
             />
           </div>
+
+          {/* Availability Field */}
           <div className="mb-4">
-            <label className="block text-gray-700">Image</label>
-            <input type="file" className="p-2 border rounded w-full" />
+            <label className="block text-gray-700">Availability *</label>
+            <select className="p-2 border rounded w-full" required>
+              <option value="">Select Availability</option>
+              <option value="in_stock">In Stock</option>
+              <option value="out_of_stock">Out of Stock</option>
+              <option value="preorder">Preorder</option>
+            </select>
           </div>
+
+          {/* Condition Field */}
+          <div className="mb-4">
+            <label className="block text-gray-700">Condition *</label>
+            <select className="p-2 border rounded w-full" required>
+              <option value="">Select Condition</option>
+              <option value="new">New</option>
+              <option value="used">Used</option>
+              <option value="refurbished">Refurbished</option>
+            </select>
+          </div>
+
+          {/* Price Field */}
+          <div className="mb-4">
+            <label className="block text-gray-700">Price *</label>
+            <input
+              type="number"
+              className="p-2 border rounded w-full"
+              placeholder="Enter Price"
+              min="0"
+              required
+            />
+          </div>
+
+          {/* Image Link Field */}
+          <div className="mb-4">
+            <label className="block text-gray-700">Image Link *</label>
+            <input
+              type="url"
+              className="p-2 border rounded w-full"
+              placeholder="Enter Image URL"
+              required
+            />
+          </div>
+
+          {/* Buttons */}
           <button
             type="button"
             onClick={closeItemModal}
@@ -250,6 +253,7 @@ const Item = () => {
           </button>
         </form>
       </Modal>
+
       <AddCategory
         modalIsOpen={categoryModalIsOpen}
         closeModal={closeCategoryModal}
@@ -262,6 +266,5 @@ const Item = () => {
     </div>
   );
 };
-
 
 export default Item;

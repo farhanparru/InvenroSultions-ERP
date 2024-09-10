@@ -5,8 +5,10 @@ const EmployeSchema = require("../Model/Employemodel");
 const Customer = require("../Model/Customermodel");
 const Floor = require('../Model/Floormodel')
 const Table = require('../Model/Hometablemodel')
+const AddToSheetItem = require('../Model/catlogItemModel')
 const WebSocket = require("ws");
 const bcrypt = require("bcrypt");
+const axios = require('axios')
 const moment = require("moment-timezone");
 const ThermalPrinter = require("node-thermal-printer").printer;
 const PrinterTypes = require("node-thermal-printer").types;
@@ -749,6 +751,50 @@ module.exports = {
       error: error.message,
     });
   }
+},
+// Google Sheet Webhook URL
 
+addSheetItem:async(req,res)=>{
+  // Google Sheet Webhook URL
+const googleSheetWebhookURL = "https://script.google.com/macros/s/AKfycbygNbw5aqZvf7t59UUX275UaiszFRz_Grcp3yYYEvkRgiEBs_aBvvyX1nKTdqfVM_b-mg/exec?gid=1028792536";
+try {
+  // Extract item data from the request body
+  const { id, title, description, availability, condition, price, image_link } = req.body;
+
+    // Generate unique id if not provided
+    const uniqueId = id || new mongoose.Types.ObjectId().toString();
+
+
+   // Save the item to the MongoDB database
+    const newItem = new AddToSheetItem({
+      id: uniqueId,
+      title,
+      description,
+      availability,
+      condition,
+      price,
+      image_link,
+    });
+
+  await newItem.save();
+
+   // Send a POST request to the Google Sheet webhook URL with the same data
+    await axios.post(googleSheetWebhookURL, {
+      id: uniqueId,
+      title,
+      description,
+      availability,
+      condition,
+      price,
+      image_link,
+    });
+
+  // Respond with success message
+  res.status(201).json({ message: 'Item successfully added to the database and Google Sheet!' });
+} catch (error) {
+  console.error("Error adding item: ", error);
+  res.status(500).json({ error: 'Failed to add item to the database or Google Sheet.' });
 }
+}
+
 };

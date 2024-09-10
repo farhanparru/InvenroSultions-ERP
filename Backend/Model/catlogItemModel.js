@@ -1,0 +1,48 @@
+const mongoose = require('mongoose');
+
+const addToSheetItemSchema = new mongoose.Schema({
+  id: {
+    type: String,
+    required: true,
+    unique: true,
+    default: function () {
+      return new mongoose.Types.ObjectId().toString(); // Generate a unique ID if not provided
+    }
+  },
+  title: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  description: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  availability: {
+    type: String,
+    enum: ['instock', 'outofstock', 'preorder'],
+    required: true
+  },
+  condition: {
+    type: String,
+    enum: ['new', 'used', 'refurbished'],
+    required: true
+  },
+  price: {
+    type: Number,
+    required: true,
+    min: 0
+  },
+  image_link: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  created_at: {
+    type: Date,
+    default: Date.now
+  }
+});
+
+module.exports = mongoose.model('AddToSheetItem', addToSheetItemSchema);

@@ -18,7 +18,6 @@ const path = require("path");
 const excelSheetDatas = require("../Model/ItemsModal");
 const XLSX = require("xlsx");
 const mongoose = require("mongoose");
-
 require("dotenv").config();
 
 // Configure Cloudinary with credentials from .env
@@ -27,6 +26,7 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
 
 module.exports = {
   PosOrder: async (req, res) => {

@@ -24,8 +24,10 @@ router.post('/createEmploye',userCtrl.createEmploye)
 router.get('/getEmploye',userCtrl.getEmploye)
 router.post('/createFloor',userCtrl.createFloor)
 router.get('/getFloor',userCtrl.getFloor)
-router.post('/createTable',userCtrl.createTable)
-router.get('/:floorId/tables', userCtrl.getTablesByFloor);
+
+router.post('/:floorId/createTable',userCtrl.createTable)
+router.get('/:floorId/getTables', userCtrl.getTablesByFloor);
+
 router.post('/add-item',userCtrl.addSheetItem)
 
 

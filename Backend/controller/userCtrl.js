@@ -3,19 +3,30 @@ const OnlineOrder = require("../Model/onlineOrdermodel");
 const Category = require("../Model/Categorymodel");
 const EmployeSchema = require("../Model/Employemodel");
 const Customer = require("../Model/Customermodel");
-const Floor = require('../Model/Floormodel')
-const Table = require('../Model/Hometablemodel')
-const AddToSheetItem = require('../Model/catlogItemModel')
+const Floor = require("../Model/Floormodel");
+const Table = require("../Model/Hometablemodel");
+const AddToSheetItem = require("../Model/catlogItemModel");
 const WebSocket = require("ws");
 const bcrypt = require("bcrypt");
-const axios = require('axios')
+const axios = require("axios");
 const moment = require("moment-timezone");
 const ThermalPrinter = require("node-thermal-printer").printer;
 const PrinterTypes = require("node-thermal-printer").types;
+const cloudinary = require("cloudinary").v2;
+const multer = require("multer");
 const path = require("path");
 const excelSheetDatas = require("../Model/ItemsModal");
 const XLSX = require("xlsx");
+const mongoose = require("mongoose");
+
 require("dotenv").config();
+
+// Configure Cloudinary with credentials from .env
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 module.exports = {
   PosOrder: async (req, res) => {
@@ -427,8 +438,6 @@ module.exports = {
     }
   },
 
-  
-
   // Add Customer
 
   addCustomer: async (req, res) => {
@@ -515,8 +524,6 @@ module.exports = {
       res.status(500).send("Server error");
     }
   },
-
- 
 
   // paymentStatus update
 
@@ -656,7 +663,7 @@ module.exports = {
     try {
       const { name, location, gratuity, minimumPartySize } = req.body;
 
-      const  createFloorDate = moment().tz("Asia/Kolkata").format();
+      const createFloorDate = moment().tz("Asia/Kolkata").format();
 
       // Create new floor
       const newFloor = new Floor({
@@ -664,7 +671,7 @@ module.exports = {
         location,
         gratuity,
         minimumPartySize,
-        createFloorDate
+        createFloorDate,
       });
 
       await newFloor.save();
@@ -677,7 +684,7 @@ module.exports = {
   },
   // get Floor
 
-  getFloor:async(req,res)=>{
+  getFloor: async (req, res) => {
     try {
       const FloorData = await Floor.find();
       res.status(200).json(FloorData);
@@ -687,114 +694,183 @@ module.exports = {
     }
   },
 
-
   // create Table
 
-   createTable:async (req, res) => {      
+  // Create Table with floor association
+  createTable: async (req, res) => {
     try {
-      const { name, seatingCapacity, priceCategory, floorId } = req.body;
-  
-      // Check if the floor exists
+     
+      const { floorId } = req.params; // Get the floorId from the URL params
+      const { name, seatingCapacity, priceCategory } = req.body;
+
+      // Find the floor by floorId
       const floor = await Floor.findById(floorId);
       if (!floor) {
-        return res.status(404).json({ message: 'Floor not found' });
+        return res.status(404).json({ message: "Floor not found" });
       }
-  
+
       // Create the table and associate it with the floor
       const newTable = new Table({
         name,
         seatingCapacity,
         priceCategory,
-        floor: floorId,  // Associate table with the floor
+        floor: floor._id, // Associate the table with the floor's ID
       });
-  
+
       // Save the new table to the database
       const savedTable = await newTable.save();
-  
+
       // Respond with the newly created table
       res.status(201).json({
-        message: 'Table created successfully',
+        message: "Table created successfully",
         data: savedTable,
       });
-  
     } catch (error) {
-      console.error('Error creating table:', error);
+      console.error("Error creating table:", error);
       res.status(500).json({
-        message: 'An error occurred while creating the table',
+        message: "An error occurred while creating the table",
         error: error.message,
       });
     }
   },
 
 
-  getTablesByFloor:async(req,res)=>{
-  try {
-    const { floorId } = req.params;
-
-    // Fetch all tables that belong to the provided floor ID
-    const tables = await Table.find({ floor: floorId });
-
-    if (!tables || tables.length === 0) {
-      return res.status(404).json({ message: 'No tables found for this floor' });
+  getTablesByFloor: async (req, res) => {
+    try {
+      const { floorId } = req.params;
+  
+      // Fetch all tables that belong to the provided floor ID and populate the floor's name
+      const tables = await Table.find({ floor: floorId })
+        .populate('floor', 'name'); // Populate the 'floor' field, selecting only the 'name'
+  
+      if (!tables || tables.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No tables found for this floor" });
+      }
+  
+      // Return the list of tables with the floor's name included
+      res.status(200).json({
+        message: "Tables fetched successfully",
+        data: tables,
+      });
+    } catch (error) {
+      console.error("Error fetching tables:", error);
+      res.status(500).json({
+        message: "An error occurred while fetching tables",
+        error: error.message,
+      });
     }
+  },
+  
 
-    // Return the list of tables
-    res.status(200).json({
-      message: 'Tables fetched successfully',
-      data: tables,
-    });
 
-  } catch (error) {
-    console.error('Error fetching tables:', error);
-    res.status(500).json({
-      message: 'An error occurred while fetching tables',
-      error: error.message,
-    });
-  }
-},
-// Google Sheet Webhook URL
 
-addSheetItem:async(req,res)=>{
   // Google Sheet Webhook URL
-const googleSheetWebhookURL = "https://script.google.com/macros/s/AKfycbygNbw5aqZvf7t59UUX275UaiszFRz_Grcp3yYYEvkRgiEBs_aBvvyX1nKTdqfVM_b-mg/exec?gid=1028792536";
-try {
-  // Extract item data from the request body
-  const { id, title, description, availability, condition, price, image_link } = req.body;
 
-    // Generate unique id if not provided
-    const uniqueId = id || new mongoose.Types.ObjectId().toString();
-
-
-   // Save the item to the MongoDB database
-    const newItem = new AddToSheetItem({
-      id: uniqueId,
-      title,
-      description,
-      availability,
-      condition,
-      price,
-      image_link,
+  addSheetItem: async (req, res) => {
+    // Google Sheet Webhook URL
+    const googleSheetWebhookURL =
+      "https://script.google.com/macros/s/AKfycbygNbw5aqZvf7t59UUX275UaiszFRz_Grcp3yYYEvkRgiEBs_aBvvyX1nKTdqfVM_b-mg/exec?gid=1028792536";
+  
+    // Multer configuration for image uploads
+    const storage = multer.diskStorage({
+      destination: (req, file, cb) => {
+        cb(null, "uploads/"); // Set your destination folder
+      },
+      filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname)); // Add timestamp to file name to avoid duplicates
+      },
     });
+  
+    const upload = multer({ storage }).single("imageFile"); // Assuming the image is uploaded with 'imageFile' key
+  
+    try {
+   
+  
+      // Step 2: Validate the request body and required fields
+      const {
+        id,
+        title,
+        description,
+        availability,
+        condition,
+        price,
+        link,
+        brand,
+      } = req.body;
 
-  await newItem.save();
-
-   // Send a POST request to the Google Sheet webhook URL with the same data
-    await axios.post(googleSheetWebhookURL, {
-      id: uniqueId,
-      title,
-      description,
-      availability,
-      condition,
-      price,
-      image_link,
-    });
-
-  // Respond with success message
-  res.status(201).json({ message: 'Item successfully added to the database and Google Sheet!' });
-} catch (error) {
-  console.error("Error adding item: ", error);
-  res.status(500).json({ error: 'Failed to add item to the database or Google Sheet.' });
-}
-}
-
+            // Log the request body
+            console.log('Request body:', req);
+            console.log('Uploaded file:', req.file);
+            
+      // Check if required fields are present
+      if (!title || !description || !availability || !condition || !price) {
+        return res.status(400).json({
+          error: "All required fields (title, description, availability, condition, price) must be provided.",
+        });
+      }
+  
+      // Upload the image via multer
+      upload(req, res, async function (err) {
+        if (err) {
+          return res.status(400).json({ error: "Image upload failed", err });
+        }
+  
+        const imageFile = req.file;
+        let imageLink = "";
+  
+        // Generate unique id if not provided
+        const uniqueId = id || new mongoose.Types.ObjectId().toString();
+  
+        // Step 1: Upload image to Cloudinary if it exists
+        if (imageFile) {
+          const result = await cloudinary.uploader.upload(imageFile.path);
+          imageLink = result.secure_url; // Secure URL returned from Cloudinary
+        }
+  
+        // Step 3: Save the data to MongoDB
+        const newItem = new AddToSheetItem({
+          id: uniqueId,
+          title,
+          description,
+          availability,
+          condition,
+          price,
+          link,
+          brand,
+          image_link: imageLink,
+        });
+  
+        await newItem.save();
+  
+        // Step 4: Send data to Google Sheets using the webhook URL
+        await axios.post(googleSheetWebhookURL, {
+          id: uniqueId,
+          title,
+          description,
+          availability,
+          condition,
+          price,
+          link,
+          brand,
+          image_link: imageLink, // The image link from Cloudinary
+        });
+  
+        // Respond with success
+        res.status(201).json({
+          message: "Item successfully added to the database and Google Sheet!",
+          id: uniqueId,
+          image_link: imageLink,
+        });
+      });
+    } catch (error) {
+      console.error("Error adding item: ", error);
+      res.status(500).json({
+        error: "Failed to add item to the database or Google Sheet.",
+      });
+    }
+  }
+  
+  
 };

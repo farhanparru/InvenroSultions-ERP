@@ -34,6 +34,17 @@ const addToSheetItemSchema = new mongoose.Schema({
     required: true,
     min: 0
   },
+
+  link: {
+    type: String,
+    required: false,  // You can set this to true if needed
+    trim: true
+  },
+  brand: {
+    type: String,
+    required: false,  // Set this to true if you want it to be mandatory
+    trim: true
+  },
   image_link: {
     type: String,
     required: true,

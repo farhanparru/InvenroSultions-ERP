@@ -15,9 +15,10 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"],
   }))
   
-// Middleware
+/// Middleware to parse JSON and form data
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended:true}))         
+app.use(bodyParser.urlencoded({ extended: true }));                                         
+
 
 // Use the userRouter for handling routes
 app.use('/api/user', userRouter);

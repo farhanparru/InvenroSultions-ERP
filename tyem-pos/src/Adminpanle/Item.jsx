@@ -4,6 +4,8 @@ import Header from "./Headr"; // Import your Header component
 import Sidebar from "./Sidebar"; // Import your Sidebar component
 import Modal from "react-modal";
 import AddCategory from "./AddCategory"; // Import the AddCategory component
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { AiFillFileExcel } from "react-icons/ai";
 
@@ -17,6 +19,17 @@ const Item = () => {
   const [itemModalIsOpen, setItemModalIsOpen] = useState(false);
   const [categoryModalIsOpen, setCategoryModalIsOpen] = useState(false);
   const [excelModalIsOpen, setExcelModalIsOpen] = useState(false);
+
+  // Form states
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [availability, setAvailability] = useState("");
+  const [condition, setCondition] = useState("");
+  const [price, setPrice] = useState(0);
+  const [link, setLink] = useState("");
+  const [brand, setBrand] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [id, setId] = useState(""); // Add a new state for the id
 
   const OpenSidebar = () => {
     setOpenSidebarToggle(!openSidebarToggle);
@@ -83,6 +96,61 @@ const Item = () => {
         });
     }
   }, [itemModalIsOpen]);
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+  
+    const formData = new FormData();
+    formData.append("id", id);
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("availability", availability);
+    formData.append("condition", condition);
+    formData.append("price", price);
+    formData.append("link", link);
+    formData.append("brand", brand);
+    formData.append("imageFile", imageFile);
+  
+    if (!imageFile) {
+      alert("Please upload an image.");
+      return;
+    }
+  
+    axios
+      .post("https://tyem.invenro.site/api/user/addItem", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then((response) => {
+        console.log("Item added successfully:", response.data);
+        setItems([...items, response.data]); // Update items
+        closeItemModal(); // Close modal
+  
+        // Clear form fields
+        setId("");
+        setTitle("");
+        setDescription("");
+        setAvailability("");
+        setCondition("");
+        setPrice("");
+        setLink("");
+        setBrand("");
+        setImageFile(null);
+  
+        // Show success toast
+        toast.success("Item added successfully!");
+      })
+      .catch((error) => {
+        console.error("There was an error adding the item!", error);
+        toast.error("Error adding item!");
+      });
+  };
+  
+  // File input change handler
+  const handleFileChange = (e) => {
+    setImageFile(e.target.files[0]); // Store the selected file
+  };
 
   return (
     <div className="p-4 flex flex-col h-screen">
@@ -170,15 +238,30 @@ const Item = () => {
         style={customStyles}
       >
         <h2>Create Item</h2>
-        <form>
+        <form onSubmit={handleFormSubmit}>
+          {/* ID Field */}
+          <div className="mb-4">
+            <label className="block text-gray-700">ID *</label>
+            <input
+              type="text"
+              name="id"
+              className="p-2 border rounded w-full"
+              placeholder="Enter Item ID"
+              value={id}
+              onChange={(e) => setId(e.target.value)}
+              required
+            />
+          </div>
           {/* Title Field */}
           <div className="mb-4">
             <label className="block text-gray-700">Title *</label>
             <input
               type="text"
+              name="title"
               className="p-2 border rounded w-full"
               placeholder="Item Title"
-              required
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
           </div>
 
@@ -186,31 +269,43 @@ const Item = () => {
           <div className="mb-4">
             <label className="block text-gray-700">Description *</label>
             <textarea
+              name="description"
               className="p-2 border rounded w-full"
               placeholder="Enter a detailed description of the item."
-              required
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
 
           {/* Availability Field */}
           <div className="mb-4">
             <label className="block text-gray-700">Availability *</label>
-            <select className="p-2 border rounded w-full" required>
+            <select
+              name="availability"
+              className="p-2 border rounded w-full"
+              value={availability}
+              onChange={(e) => setAvailability(e.target.value)}
+            >
               <option value="">Select Availability</option>
-              <option value="in_stock">In Stock</option>
-              <option value="out_of_stock">Out of Stock</option>
-              <option value="preorder">Preorder</option>
+              <option value="instock">instock</option>
+              <option value="outofstock">outofstock</option>
+              <option value="preorder">preorder</option>
             </select>
           </div>
 
           {/* Condition Field */}
           <div className="mb-4">
             <label className="block text-gray-700">Condition *</label>
-            <select className="p-2 border rounded w-full" required>
+            <select
+              name="condition"
+              className="p-2 border rounded w-full"
+              value={condition}
+              onChange={(e) => setCondition(e.target.value)}
+            >
               <option value="">Select Condition</option>
-              <option value="new">New</option>
-              <option value="used">Used</option>
-              <option value="refurbished">Refurbished</option>
+              <option value="new">new</option>
+              <option value="used">used</option>
+              <option value="refurbished">refurbished</option>
             </select>
           </div>
 
@@ -219,20 +314,52 @@ const Item = () => {
             <label className="block text-gray-700">Price *</label>
             <input
               type="number"
+              name="price"
               className="p-2 border rounded w-full"
               placeholder="Enter Price"
               min="0"
               required
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
             />
           </div>
 
-          {/* Image Link Field */}
+          {/* Link Field */}
           <div className="mb-4">
-            <label className="block text-gray-700">Image Link *</label>
+            <label className="block text-gray-700">Link</label>
             <input
               type="url"
+              name="link"
               className="p-2 border rounded w-full"
-              placeholder="Enter Image URL"
+              placeholder="Enter Item Link"
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+              pattern="https://.*" // Optional pattern to ensure HTTPS links
+              title="Please enter a valid URL"
+            />
+          </div>
+
+          {/* Brand Field */}
+          <div className="mb-4">
+            <label className="block text-gray-700">Brand</label>
+            <input
+              type="text"
+              name="brand"
+              className="p-2 border rounded w-full"
+              placeholder="Enter Brand"
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+            />
+          </div>
+
+          {/* Image Field */}
+          <div className="mb-4">
+            <label className="block text-gray-700">Image *</label>
+            <input
+              type="file"
+              name="imageFile"
+              className="p-2 border rounded w-full"
+              onChange={handleFileChange}
               required
             />
           </div>
@@ -253,7 +380,7 @@ const Item = () => {
           </button>
         </form>
       </Modal>
-
+      <ToastContainer />
       <AddCategory
         modalIsOpen={categoryModalIsOpen}
         closeModal={closeCategoryModal}

@@ -14,22 +14,22 @@ const addToSheetItemSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  description: {
+ description: {
     type: String,
     required: true,
     trim: true
   },
-  availability: {
+availability: {
     type: String,
     enum: ['instock', 'outofstock', 'preorder'],
     required: true
   },
-  condition: {
+  condition: {                               
     type: String,
     enum: ['new', 'used', 'refurbished'],
     required: true
   },
-  price: {
+ price: {
     type: Number,
     required: true,
     min: 0
@@ -37,12 +37,12 @@ const addToSheetItemSchema = new mongoose.Schema({
 
   link: {
     type: String,
-    required: false,  // You can set this to true if needed
+    required: true,  // You can set this to true if needed                  
     trim: true
   },
   brand: {
     type: String,
-    required: false,  // Set this to true if you want it to be mandatory
+    required: true,// Set this to true if you want it to be mandatory
     trim: true
   },
   image_link: {

@@ -171,7 +171,7 @@ module.exports = {
         customer_phone_number,
         payment_status,
         item_lines, // Extract item_lines from the request body
-      } = req.body;
+      } = req.body;                                   
 
       // Map item_lines to orderDetails structure
       const orderDetails = item_lines.map((item) => ({
@@ -786,31 +786,6 @@ module.exports = {
     const upload = multer({ storage }).single("imageFile"); // Assuming the image is uploaded with 'imageFile' key
   
     try {
-   
-  
-      // Step 2: Validate the request body and required fields
-      const {
-        id,
-        title,
-        description,
-        availability,
-        condition,
-        price,
-        link,
-        brand,
-      } = req.body;
-
-            // Log the request body
-            console.log('Request body:', req);
-            console.log('Uploaded file:', req.file);
-            
-      // Check if required fields are present
-      if (!title || !description || !availability || !condition || !price) {
-        return res.status(400).json({
-          error: "All required fields (title, description, availability, condition, price) must be provided.",
-        });
-      }
-  
       // Upload the image via multer
       upload(req, res, async function (err) {
         if (err) {
@@ -819,6 +794,20 @@ module.exports = {
   
         const imageFile = req.file;
         let imageLink = "";
+  
+        // Extract fields from the request body after multer processes the request
+        const { id, title, description, availability, condition, price, link, brand } = req.body;
+  
+        // Log the request body and uploaded file
+        console.log('Request body:', req.body);
+        console.log('Uploaded file:', req.file);
+  
+        // Validate required fields
+        if (!title || !description || !availability || !condition || !price) {
+          return res.status(400).json({
+            error: "All required fields (title, description, availability, condition, price) must be provided.",
+          });
+        }
   
         // Generate unique id if not provided
         const uniqueId = id || new mongoose.Types.ObjectId().toString();
@@ -829,7 +818,7 @@ module.exports = {
           imageLink = result.secure_url; // Secure URL returned from Cloudinary
         }
   
-        // Step 3: Save the data to MongoDB
+        // Step 2: Save the data to MongoDB
         const newItem = new AddToSheetItem({
           id: uniqueId,
           title,
@@ -844,7 +833,7 @@ module.exports = {
   
         await newItem.save();
   
-        // Step 4: Send data to Google Sheets using the webhook URL
+        // Step 3: Send data to Google Sheets using the webhook URL
         await axios.post(googleSheetWebhookURL, {
           id: uniqueId,
           title,

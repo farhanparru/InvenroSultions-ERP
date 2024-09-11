@@ -28,7 +28,7 @@ router.get('/getFloor',userCtrl.getFloor)
 router.post('/:floorId/createTable',userCtrl.createTable)
 router.get('/:floorId/getTables', userCtrl.getTablesByFloor);
 
-router.post('/add-item',userCtrl.addSheetItem)
+router.post('/addItem',userCtrl.addSheetItem)
 
 
 

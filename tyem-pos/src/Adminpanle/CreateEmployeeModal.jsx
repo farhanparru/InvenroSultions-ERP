@@ -45,7 +45,7 @@ const CreateEmployeeModal = ({ isOpen, onClose }) => {
     }
 
     try {
-      await axios.post('http://localhost:8000/api/user/createEmploye', formData);
+      await axios.post('https://tyem.invenro.site/api/user/createEmploye', formData);
       toast.success('Employee created successfully!');
 
       // Clear form data

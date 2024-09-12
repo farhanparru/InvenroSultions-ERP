@@ -5,6 +5,7 @@ const EmployeSchema = require("../Model/Employemodel");
 const Customer = require("../Model/Customermodel");
 const Floor = require("../Model/Floormodel");
 const Table = require("../Model/Hometablemodel");
+const Waiter = require('../Model/Waiterodermodel')
 const AddToSheetItem = require("../Model/catlogItemModel");
 const WebSocket = require("ws");
 const bcrypt = require("bcrypt");
@@ -26,7 +27,6 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
 
 module.exports = {
   PosOrder: async (req, res) => {
@@ -171,7 +171,7 @@ module.exports = {
         customer_phone_number,
         payment_status,
         item_lines, // Extract item_lines from the request body
-      } = req.body;                                   
+      } = req.body;
 
       // Map item_lines to orderDetails structure
       const orderDetails = item_lines.map((item) => ({
@@ -699,7 +699,6 @@ module.exports = {
   // Create Table with floor association
   createTable: async (req, res) => {
     try {
-     
       const { floorId } = req.params; // Get the floorId from the URL params
       const { name, seatingCapacity, priceCategory } = req.body;
 
@@ -734,21 +733,22 @@ module.exports = {
     }
   },
 
-
   getTablesByFloor: async (req, res) => {
     try {
       const { floorId } = req.params;
-  
+
       // Fetch all tables that belong to the provided floor ID and populate the floor's name
-      const tables = await Table.find({ floor: floorId })
-        .populate('floor', 'name'); // Populate the 'floor' field, selecting only the 'name'
-  
+      const tables = await Table.find({ floor: floorId }).populate(
+        "floor",
+        "name"
+      ); // Populate the 'floor' field, selecting only the 'name'
+
       if (!tables || tables.length === 0) {
         return res
           .status(404)
           .json({ message: "No tables found for this floor" });
       }
-  
+
       // Return the list of tables with the floor's name included
       res.status(200).json({
         message: "Tables fetched successfully",
@@ -762,17 +762,14 @@ module.exports = {
       });
     }
   },
-  
-
-
 
   // Google Sheet Webhook URL
 
   addSheetItem: async (req, res) => {
     // Google Sheet Webhook URL
     const googleSheetWebhookURL =
-      "https://script.google.com/macros/s/AKfycbygNbw5aqZvf7t59UUX275UaiszFRz_Grcp3yYYEvkRgiEBs_aBvvyX1nKTdqfVM_b-mg/exec?gid=1028792536";
-  
+      "https://script.google.com/macros/s/AKfycbxQSe8f6i3ifmgC7oepM72UQC90gLkehtnjrvYFFzbHAzw_MPk-5dwFBuhqsh69JfjOGg/exec?gid=0";
+
     // Multer configuration for image uploads
     const storage = multer.diskStorage({
       destination: (req, file, cb) => {
@@ -782,42 +779,52 @@ module.exports = {
         cb(null, Date.now() + path.extname(file.originalname)); // Add timestamp to file name to avoid duplicates
       },
     });
-  
+
     const upload = multer({ storage }).single("imageFile"); // Assuming the image is uploaded with 'imageFile' key
-  
+
     try {
       // Upload the image via multer
       upload(req, res, async function (err) {
         if (err) {
           return res.status(400).json({ error: "Image upload failed", err });
         }
-  
+
         const imageFile = req.file;
         let imageLink = "";
-  
+
         // Extract fields from the request body after multer processes the request
-        const { id, title, description, availability, condition, price, link, brand } = req.body;
-  
+        const {
+          id,
+          title,
+          description,
+          availability,
+          condition,
+          price,
+          link,
+          brand,
+        } = req.body;
+
         // Log the request body and uploaded file
-        console.log('Request body:', req.body);
-        console.log('Uploaded file:', req.file);
-  
+        console.log("Request body:", req.body);
+        console.log("Uploaded file:", req.file);
+
         // Validate required fields
         if (!title || !description || !availability || !condition || !price) {
           return res.status(400).json({
-            error: "All required fields (title, description, availability, condition, price) must be provided.",
+            error:
+              "All required fields (title, description, availability, condition, price) must be provided.",
           });
         }
-  
+
         // Generate unique id if not provided
         const uniqueId = id || new mongoose.Types.ObjectId().toString();
-  
+
         // Step 1: Upload image to Cloudinary if it exists
         if (imageFile) {
           const result = await cloudinary.uploader.upload(imageFile.path);
           imageLink = result.secure_url; // Secure URL returned from Cloudinary
         }
-  
+
         // Step 2: Save the data to MongoDB
         const newItem = new AddToSheetItem({
           id: uniqueId,
@@ -830,9 +837,9 @@ module.exports = {
           brand,
           image_link: imageLink,
         });
-  
+
         await newItem.save();
-  
+
         // Step 3: Send data to Google Sheets using the webhook URL
         await axios.post(googleSheetWebhookURL, {
           id: uniqueId,
@@ -845,7 +852,7 @@ module.exports = {
           brand,
           image_link: imageLink, // The image link from Cloudinary
         });
-  
+
         // Respond with success
         res.status(201).json({
           message: "Item successfully added to the database and Google Sheet!",
@@ -859,7 +866,53 @@ module.exports = {
         error: "Failed to add item to the database or Google Sheet.",
       });
     }
-  }
-  
-  
+  },
+
+  // POST request to add a new waiter entry
+
+  addWaiterOrder: async (req, res) => {
+    try {
+      // Destructure data from the request body
+      const {
+        billnumber,
+        OdercreateDate,
+        tableIds, // These should now be ObjectIds
+        items,
+        subTotal,
+        tax,
+        total,
+        orderStatus,
+        customerName,
+        priceCategory,
+      } = req.body;
+
+      // Create a new Waiter instance
+      const newWaiterOrder = new Waiter({
+        billnumber,
+        OdercreateDate,
+        tableIds, // Store ObjectIds here
+        items,
+        subTotal,
+        tax,
+        total,
+        orderStatus,
+        customerName,
+        priceCategory,
+      });
+      // Save the new order to the database
+      await newWaiterOrder.save();
+
+      // Send a success response
+      res.status(201).json({
+        message: "New waiter order added successfully",
+        waiterOrder: newWaiterOrder,
+      });
+    } catch (error) {
+      console.error("Error adding waiter order:", error);
+      res.status(500).json({
+        message: "Failed to add waiter order",
+        error: error.message,
+      });
+    }
+  },
 };

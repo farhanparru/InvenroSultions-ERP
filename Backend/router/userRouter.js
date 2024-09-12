@@ -24,6 +24,7 @@ router.post('/createEmploye',userCtrl.createEmploye)
 router.get('/getEmploye',userCtrl.getEmploye)
 router.post('/createFloor',userCtrl.createFloor)
 router.get('/getFloor',userCtrl.getFloor)
+router.post('/WaiterOder',userCtrl.addWaiterOrder)
 
 router.post('/:floorId/createTable',userCtrl.createTable)
 router.get('/:floorId/getTables', userCtrl.getTablesByFloor);

@@ -60,7 +60,7 @@ const Item = () => {
       marginRight: "-50%",
       transform: "translate(-50%, -50%)",
       width: "40%", // Adjust the width as needed
-      height: "60%", 
+      height: "60%",
     },
   };
 
@@ -70,7 +70,6 @@ const Item = () => {
   const handleExcelUpload = (data) => {
     console.log("Uploaded Excel Data:", data);
     // Process the data as needed, for example:
-    
   };
 
   useEffect(() => {
@@ -99,7 +98,7 @@ const Item = () => {
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
-  
+
     const formData = new FormData();
     formData.append("id", id);
     formData.append("title", title);
@@ -110,12 +109,12 @@ const Item = () => {
     formData.append("link", link);
     formData.append("brand", brand);
     formData.append("imageFile", imageFile);
-  
+
     if (!imageFile) {
       alert("Please upload an image.");
       return;
     }
-  
+
     axios
       .post("https://tyem.invenro.site/api/user/addItem", formData, {
         headers: {
@@ -126,7 +125,7 @@ const Item = () => {
         console.log("Item added successfully:", response.data);
         setItems([...items, response.data]); // Update items
         closeItemModal(); // Close modal
-  
+
         // Clear form fields
         setId("");
         setTitle("");
@@ -137,7 +136,7 @@ const Item = () => {
         setLink("");
         setBrand("");
         setImageFile(null);
-  
+
         // Show success toast
         toast.success("Item added successfully!");
       })
@@ -146,7 +145,7 @@ const Item = () => {
         toast.error("Error adding item!");
       });
   };
-  
+
   // File input change handler
   const handleFileChange = (e) => {
     setImageFile(e.target.files[0]); // Store the selected file
@@ -232,160 +231,160 @@ const Item = () => {
         </div>
       </div>
       <Modal
-  isOpen={itemModalIsOpen}
-  onRequestClose={closeItemModal}
-  contentLabel="Create Item Modal"
-  style={customStyles}
->
-  <h2 className="text-2xl mb-4">Create Item</h2>
-  
-  <form onSubmit={handleFormSubmit}>
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {/* ID Field */}
-      <div className="mb-4">
-        <label className="block text-gray-700">ID *</label>
-        <input
-          type="text"
-          name="id"
-          className="p-2 border rounded w-full"
-          placeholder="Enter Item ID"
-          value={id}
-          onChange={(e) => setId(e.target.value)}
-          required
-        />
-      </div>
-
-      {/* Title Field */}
-      <div className="mb-4">
-        <label className="block text-gray-700">Title *</label>
-        <input
-          type="text"
-          name="title"
-          className="p-2 border rounded w-full"
-          placeholder="Item Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-      </div>
-
-      {/* Description Field */}
-      <div className="mb-4">
-        <label className="block text-gray-700">Description *</label>
-        <textarea
-          name="description"
-          className="p-2 border rounded w-full"
-          placeholder="Enter a detailed description of the item."
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-      </div>
-
-      {/* Availability Field */}
-      <div className="mb-4">
-        <label className="block text-gray-700">Availability *</label>
-        <select
-          name="availability"
-          className="p-2 border rounded w-full"
-          value={availability}
-          onChange={(e) => setAvailability(e.target.value)}
-        >
-          <option value="">Select Availability</option>
-          <option value="instock">In Stock</option>
-          <option value="outofstock">Out of Stock</option>
-          <option value="preorder">Pre-order</option>
-        </select>
-      </div>
-
-      {/* Condition Field */}
-      <div className="mb-4">
-        <label className="block text-gray-700">Condition *</label>
-        <select
-          name="condition"
-          className="p-2 border rounded w-full"
-          value={condition}
-          onChange={(e) => setCondition(e.target.value)}
-        >
-          <option value="">Select Condition</option>
-          <option value="new">New</option>
-          <option value="used">Used</option>
-          <option value="refurbished">Refurbished</option>
-        </select>
-      </div>
-
-      {/* Price Field */}
-      <div className="mb-4">
-        <label className="block text-gray-700">Price *</label>
-        <input
-          type="number"
-          name="price"
-          className="p-2 border rounded w-full"
-          placeholder="Enter Price"
-          min="0"
-          required
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-        />
-      </div>
-
-      {/* Link Field */}
-      <div className="mb-4">
-        <label className="block text-gray-700">Link</label>
-        <input
-          type="url"
-          name="link"
-          className="p-2 border rounded w-full"
-          placeholder="Enter Item Link"
-          value={link}
-          onChange={(e) => setLink(e.target.value)}
-          pattern="https://.*" // Optional pattern to ensure HTTPS links
-          title="Please enter a valid URL"
-        />
-      </div>
-
-      {/* Brand Field */}
-      <div className="mb-4">
-        <label className="block text-gray-700">Brand</label>
-        <input
-          type="text"
-          name="brand"
-          className="p-2 border rounded w-full"
-          placeholder="Enter Brand"
-          value={brand}
-          onChange={(e) => setBrand(e.target.value)}
-        />
-      </div>
-
-      {/* Image Field */}
-      <div className="mb-4">
-        <label className="block text-gray-700">Image *</label>
-        <input
-          type="file"
-          name="imageFile"
-          className="p-2 border rounded w-full"
-          onChange={handleFileChange}
-          required
-        />
-      </div>
-    </div>
-
-    {/* Buttons */}
-    <div className="mt-4 flex justify-end">
-      <button
-        type="button"
-        onClick={closeItemModal}
-        className="p-2 bg-purple-500 text-white rounded mr-2"
+        isOpen={itemModalIsOpen}
+        onRequestClose={closeItemModal}
+        contentLabel="Create Item Modal"
+        style={customStyles}
       >
-        Cancel
-      </button>
-      <button
-        type="submit"
-        className="p-2 bg-purple-500 text-white rounded"
-      >
-        Save
-      </button>
-    </div>
-  </form>
-</Modal>
+        <h2 className="text-2xl mb-4">Create Item</h2>
+
+        <form onSubmit={handleFormSubmit}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* ID Field */}
+            <div className="mb-4">
+              <label className="block text-gray-700">ID *</label>
+              <input
+                type="text"
+                name="id"
+                className="p-2 border rounded w-full"
+                placeholder="Enter Item ID"
+                value={id}
+                onChange={(e) => setId(e.target.value)}
+                required
+              />
+            </div>
+
+            {/* Title Field */}
+            <div className="mb-4">
+              <label className="block text-gray-700">Title *</label>
+              <input
+                type="text"
+                name="title"
+                className="p-2 border rounded w-full"
+                placeholder="Item Title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+
+            {/* Description Field */}
+            <div className="mb-4">
+              <label className="block text-gray-700">Description *</label>
+              <textarea
+                name="description"
+                className="p-2 border rounded w-full"
+                placeholder="Enter a detailed description of the item."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+
+            {/* Availability Field */}
+            <div className="mb-4">
+              <label className="block text-gray-700">Availability *</label>
+              <select
+                name="availability"
+                className="p-2 border rounded w-full"
+                value={availability}
+                onChange={(e) => setAvailability(e.target.value)}
+              >
+                <option value="">Select Availability</option>
+                <option value="instock">In Stock</option>
+                <option value="outofstock">Out of Stock</option>
+                <option value="preorder">Pre-order</option>
+              </select>
+            </div>
+
+            {/* Condition Field */}
+            <div className="mb-4">
+              <label className="block text-gray-700">Condition *</label>
+              <select
+                name="condition"
+                className="p-2 border rounded w-full"
+                value={condition}
+                onChange={(e) => setCondition(e.target.value)}
+              >
+                <option value="">Select Condition</option>
+                <option value="new">New</option>
+                <option value="used">Used</option>
+                <option value="refurbished">Refurbished</option>
+              </select>
+            </div>
+
+            {/* Price Field */}
+            <div className="mb-4">
+              <label className="block text-gray-700">Price *</label>
+              <input
+                type="number"
+                name="price"
+                className="p-2 border rounded w-full"
+                placeholder="Enter Price"
+                min="0"
+                required
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+              />
+            </div>
+
+            {/* Link Field */}
+            <div className="mb-4">
+              <label className="block text-gray-700">Link</label>
+              <input
+                type="url"
+                name="link"
+                className="p-2 border rounded w-full"
+                placeholder="Enter Item Link"
+                value={link}
+                onChange={(e) => setLink(e.target.value)}
+                pattern="https://.*" // Optional pattern to ensure HTTPS links
+                title="Please enter a valid URL"
+              />
+            </div>
+
+            {/* Brand Field */}
+            <div className="mb-4">
+              <label className="block text-gray-700">Brand</label>
+              <input
+                type="text"
+                name="brand"
+                className="p-2 border rounded w-full"
+                placeholder="Enter Brand"
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+              />
+            </div>
+
+            {/* Image Field */}
+            <div className="mb-4">
+              <label className="block text-gray-700">Image *</label>
+              <input
+                type="file"
+                name="imageFile"
+                className="p-2 border rounded w-full"
+                onChange={handleFileChange}
+                required
+              />
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div className="mt-4 flex justify-end">
+            <button
+              type="button"
+              onClick={closeItemModal}
+              className="p-2 bg-purple-500 text-white rounded mr-2"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="p-2 bg-purple-500 text-white rounded"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       <ToastContainer />
       <AddCategory

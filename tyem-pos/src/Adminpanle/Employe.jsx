@@ -55,7 +55,7 @@ const EmployeSection = () => {
     const fetchEmployees = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/user/getEmploye"
+          "https://tyem.invenro.site/api/user/getEmploye"
         );
         setEmployees(response.data);
       } catch (error) {

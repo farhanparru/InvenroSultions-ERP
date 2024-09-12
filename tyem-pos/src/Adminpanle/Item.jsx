@@ -60,7 +60,7 @@ const Item = () => {
       marginRight: "-50%",
       transform: "translate(-50%, -50%)",
       width: "40%", // Adjust the width as needed
-      height: "60%", // Adjust the height as needed
+      height: "60%", 
     },
   };
 
@@ -70,7 +70,7 @@ const Item = () => {
   const handleExcelUpload = (data) => {
     console.log("Uploaded Excel Data:", data);
     // Process the data as needed, for example:
-    // setItems(data);
+    
   };
 
   useEffect(() => {

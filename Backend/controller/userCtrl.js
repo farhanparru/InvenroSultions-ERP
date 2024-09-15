@@ -5,14 +5,12 @@ const EmployeSchema = require("../Model/Employemodel");
 const Customer = require("../Model/Customermodel");
 const Floor = require("../Model/Floormodel");
 const Table = require("../Model/Hometablemodel");
-const Waiter = require('../Model/Waiterodermodel')
+const Waiter = require("../Model/Waiterodermodel");
 const AddToSheetItem = require("../Model/catlogItemModel");
 const WebSocket = require("ws");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
 const moment = require("moment-timezone");
-const ThermalPrinter = require("node-thermal-printer").printer;
-const PrinterTypes = require("node-thermal-printer").types;
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
 const path = require("path");
@@ -77,77 +75,6 @@ module.exports = {
       });
     }
   },
-  // PosOrder sales printe
-  printOrderReceipt: async (req, res) => {
-    try {
-      const {
-        orderDetails,
-        location,
-        itemDetails,
-        method,
-        total,
-        discount,
-        qrCodeData,
-      } = req.body;
-
-      // Initialize the printer
-      const printer = new ThermalPrinter({
-        type: PrinterTypes.CUSTOM, // Use 'PrinterTypes.STAR' if you have a Star printer
-        interface: "USB001", // Adjust based on your setup
-        characterSet: "SLOVENIA",
-        removeSpecialCharacters: false,
-        lineCharacter: "=",
-      });
-
-      const isConnected = await printer.isPrinterConnected();
-      console.log("Printer connected:", isConnected);
-
-      if (!isConnected) {
-        console.error("Printer is not connected.");
-        return res.status(500).send("Printer is not connected.");
-      }
-
-      printer.alignCenter();
-      printer.println("Restaurant Name");
-      printer.drawLine();
-
-      printer.alignLeft();
-      printer.println(`Order Number: ${orderDetails.orderNumber}`);
-      printer.println(`Invoice Number: ${orderDetails.invoiceNumber}`);
-      printer.println(`Customer: ${orderDetails.customerName}`);
-      printer.println(`Location: ${location}`);
-      printer.drawLine();
-
-      itemDetails.forEach((item, index) => {
-        printer.println(`${index + 1}. ${item.itemName} x ${item.quantity}`);
-      });
-
-      printer.drawLine();
-      printer.println(`Payment Method: ${method}`);
-      printer.println(`Total: ${total}`);
-      printer.println(`Discount: ${discount || "None"}`);
-      printer.drawLine();
-      printer.println("Thank you for dining with us!");
-
-      if (qrCodeData) {
-        printer.println("Scan to View Details:");
-        printer.printQR(qrCodeData, {
-          cellSize: 8,
-          correction: "M",
-        });
-      }
-
-      printer.cut();
-
-      await printer.execute();
-      console.log("Receipt printed successfully.");
-      res.send("Receipt printed successfully");
-    } catch (error) {
-      console.error("Error printing receipt:", error);
-      res.status(500).send("Error printing receipt");
-    }
-  },
-  // sles report data get
 
   getOrders: async (req, res) => {
     try {
@@ -260,121 +187,6 @@ module.exports = {
     } catch (error) {
       console.error("Error processing customer data:", error);
       res.status(500).json({ message: "Internal Server Error" });
-    }
-  },
-
-  // node thermal printer
-
-  handleReciptprinter: async (req, res) => {
-    console.log(orderData, "orderData");
-
-    try {
-      const {
-        order_id,
-        catalog_id,
-        payment_method,
-        cart_total,
-        customer_name,
-        customer_phone_number,
-        payment_status,
-        item_lines,
-      } = req.body;
-
-      // Map item_lines to orderDetails structure
-      const orderDetails = item_lines
-        ? item_lines.map((item) => ({
-            product_name: item.product_name,
-            product_quantity: item.product_quantity,
-            product_currency: item.product_currency,
-            unit_price: item.unit_price,
-          }))
-        : [];
-
-      const orderDate = moment().tz("Asia/Kolkata").format();
-
-      // Construct order data
-      const orderData = {
-        orderDetails: orderDetails,
-        orderMeta: {
-          posOrderId: order_id,
-          orderType: catalog_id,
-          paymentMethod: payment_method,
-          paymentTendered: cart_total,
-          orderDate: orderDate,
-          paymentStatus: payment_status,
-        },
-        customer: {
-          name: customer_name,
-          phone: customer_phone_number,
-        },
-      };
-
-      // Initialize printer
-      const printer = new ThermalPrinter({
-        type: PrinterTypes.ROCKET, // Assuming ROCKET is a valid type
-        interface: "tcp://192.168.1.100:9100", // IP address and port for the printer
-      });
-
-      // Print Company Logo
-      const logoPath = path.join(
-        __dirname,
-        "../../tyem-pos/src/assets/Logo.png"
-      );
-      printer.alignCenter();
-      printer.printImage(logoPath, function (done) {
-        console.log("Logo printed");
-      });
-      printer.newLine();
-
-      printer.bold(true);
-      printer.println(`Order ID: ${order_id}`);
-      printer.println(`Date: ${orderDate}`);
-      printer.println(`Customer: ${customer_name}`);
-      printer.newLine();
-
-      // Ensure orderDetails has at least one item before accessing [0]
-      if (orderDetails.length > 0) {
-        orderDetails.forEach((item) => {
-          printer.println(`${item.product_name} x${item.product_quantity}`);
-          printer.println(`${item.product_currency}${item.unit_price}`);
-          printer.drawLine();
-        });
-
-        printer.newLine();
-        printer.bold(true);
-        printer.println(
-          `Total: ${orderDetails[0].product_currency}${orderData.orderMeta.paymentTendered}`
-        );
-        printer.bold(false);
-        printer.println(`Payment Method: ${orderData.orderMeta.paymentMethod}`);
-        printer.println(`Payment Status: ${orderData.orderMeta.paymentStatus}`);
-        printer.newLine();
-
-        // Print QR Code
-        const qrCodeData = `Order ID: ${order_id}\nDate: ${orderDate}\nTotal: ${orderDetails[0].product_currency}${orderData.orderMeta.paymentTendered}`;
-        printer.alignCenter();
-        printer.printQR(qrCodeData, { cellSize: 6 });
-        printer.newLine();
-        printer.cut();
-      } else {
-        printer.println("No order details available.");
-      }
-
-      // Check if the printer is connected
-      const isConnected = await printer.isPrinterConnected();
-      // console.log(isConnected);
-
-      if (isConnected) {
-        await printer.execute();
-        console.log("Receipt printed successfully.");
-      } else {
-        console.error("Printer is not connected.");
-      }
-
-      res.send("Receipt printed successfully");
-    } catch (printError) {
-      console.error("Error printing receipt:", printError);
-      res.status(500).send("Error printing receipt");
     }
   },
 
@@ -700,7 +512,25 @@ module.exports = {
   createTable: async (req, res) => {
     try {
       const { floorId } = req.params; // Get the floorId from the URL params
-      const { name, seatingCapacity, priceCategory } = req.body;
+      const { name, tableNumber, seatingCapacity, priceCategory } = req.body;
+
+      console.log("Request Body:", req.body);
+
+      // Ensure that all required fields are provided
+      if (!name || !tableNumber || !seatingCapacity || !priceCategory) {
+        return res.status(400).json({
+          message:
+            "All fields (name, tableNumber, seatingCapacity, priceCategory) are required.",
+        });
+      }
+
+      const existingTable = await Table.findOne({ tableNumber });
+      if (existingTable) {
+        return res.status(400).json({
+          message:
+            "Table number already exists. Please use a different table number.",
+        });
+      }
 
       // Find the floor by floorId
       const floor = await Floor.findById(floorId);
@@ -711,6 +541,7 @@ module.exports = {
       // Create the table and associate it with the floor
       const newTable = new Table({
         name,
+        tableNumber, // Include tableNumber here
         seatingCapacity,
         priceCategory,
         floor: floor._id, // Associate the table with the floor's ID
@@ -728,6 +559,35 @@ module.exports = {
       console.error("Error creating table:", error);
       res.status(500).json({
         message: "An error occurred while creating the table",
+        error: error.message,
+      });
+    }
+  },
+
+  blockTable: async (req, res) => {
+    try {
+      const { tableId } = req.params;
+      const { isBlocked } = req.body;
+
+      // Find the table by its ID
+
+      const table = await Table.findById(tableId);
+      if (!table) {
+        return res.status(404).json({ message: "Table not found" });
+      }
+      // Update the isBlocked status of the table
+      table.isBlocked = isBlocked;
+      // Save the updated table to the database
+      const updatedTable = await table.save();
+      res.status(200).json({
+        message: `Table ${isBlocked ? "blocked" : "unblocked"} successfully`,
+        data: updatedTable,
+      });
+      
+    } catch (error) {
+      console.error("Error blocking/unblocking table:", error);
+      res.status(500).json({
+        message: "An error occurred while updating the table status",
         error: error.message,
       });
     }
@@ -913,6 +773,18 @@ module.exports = {
         message: "Failed to add waiter order",
         error: error.message,
       });
+    }
+  },
+
+  // getWaIterOder
+
+  getWaIterOder: async (req, res) => {
+    try {
+      const WaIterOder = await Waiter.find();
+      res.status(200).json(WaIterOder);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error retrieving items.");
     }
   },
 };

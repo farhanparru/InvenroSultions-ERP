@@ -8,12 +8,15 @@ const bodyParser = require('body-parser');
 const userRouter = require('./router/userRouter')
 const {Server} = require('ws');
 
-app.use(cors({   
-    origin: "https://ventrues.invenro.site", 
-    methods: "GET,POST,PUT,DELETE, PATCH",
+app.use(cors({
+    origin: [
+      "https://zaafaonlinestore.invenro.site",
+      "https://ventrues.invenro.site"
+    ],
+    methods: "GET,POST,PUT,DELETE,PATCH",
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
-  }))
+  }));
   
 /// Middleware to parse JSON and form data
 app.use(bodyParser.json());

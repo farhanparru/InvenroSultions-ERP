@@ -1,5 +1,5 @@
 // Backend API URL
-const API_URL = 'https://tyem.invenro.site/api/tyem/Whatsappget';
+const API_URL = 'http://localhost:8000/api/tyem/Whatsappget';
 // WebSocket URL
 const WEBSOCKET_URL = 'wss://tyem.invenro.site';
 

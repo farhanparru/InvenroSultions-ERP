@@ -14,17 +14,17 @@ router.get('/getCategory', userCtrl.getCategory)
 router.post('/addCustomer', userCtrl.addCustomer)
 router.get('/getCustomer', userCtrl.getCustomer);
 router.put('/orders/:id/status',userCtrl.statusUpdate)
-router.post('/printreceipt', userCtrl.handleReciptprinter)
 router.post('/Onlinecustomer',userCtrl.onlineCustomer)
 router.patch('/PaymentStatus/:id', userCtrl.paymentStatus);
 router.post('/importexcel', upload.single('file'),userCtrl.ImportExcel);
-router.get('/ExcelItems',userCtrl.SheetDataGet)
-router.post('/salesPrint',userCtrl.printOrderReceipt)
-router.post('/createEmploye',userCtrl.createEmploye)
+router.get('/ExcelItems',userCtrl.SheetDataGet)    
+router.post('/createEmploye',userCtrl.createEmploye)                                 
 router.get('/getEmploye',userCtrl.getEmploye)
 router.post('/createFloor',userCtrl.createFloor)
 router.get('/getFloor',userCtrl.getFloor)
 router.post('/WaiterOder',userCtrl.addWaiterOrder)
+router.get('/getWaIterOder',userCtrl.getWaIterOder)
+router.post('/:tableId/BlockedTable',userCtrl.blockTable)
 
 router.post('/:floorId/createTable',userCtrl.createTable)
 router.get('/:floorId/getTables', userCtrl.getTablesByFloor);

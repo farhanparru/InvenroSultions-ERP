@@ -7,6 +7,11 @@ const tableSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+  tableNumber: {
+    type: Number,
+    required: true,
+    unique: true,  // Ensure table numbers are unique
+  },
   seatingCapacity: {
     type: Number,
     required: true,
@@ -15,7 +20,7 @@ const tableSchema = new mongoose.Schema({
   priceCategory: {
     type: String,
     required: true,
-    enum: ['Dine In', 'Delivery', 'Online','Parcel'],  
+    enum: ['Dine In', 'Delivery', 'Online', 'Parcel'],  
   },
   floor: {
     type: mongoose.Schema.Types.ObjectId,
@@ -25,6 +30,10 @@ const tableSchema = new mongoose.Schema({
   createTableDate: {
     type: Date,
     default: Date.now, // Store the current date as UTC
+  },
+  isBlocked: {
+    type: Boolean,
+    default: false,  // Default to false, meaning the table is not blocked initially
   }
 });
 

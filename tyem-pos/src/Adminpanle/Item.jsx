@@ -289,7 +289,7 @@ const Item = () => {
                 onChange={(e) => setAvailability(e.target.value)}
               >
                 <option value="">Select Availability</option>
-                <option value="instock">In Stock</option>
+                <option value="in_stock">in_stock</option>
                 <option value="outofstock">Out of Stock</option>
                 <option value="preorder">Pre-order</option>
               </select>

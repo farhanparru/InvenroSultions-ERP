@@ -21,7 +21,7 @@ const addToSheetItemSchema = new mongoose.Schema({
   },
 availability: {
     type: String,
-    enum: ['instock', 'outofstock', 'preorder'],
+    enum: ['in_stock', 'outofstock', 'preorder'],
     required: true
   },
   condition: {                               

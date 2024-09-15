@@ -17,7 +17,7 @@ export const fetchOrders = async () => {
     console.error( error);
     throw error;
   }
-};
+}
 
 
 export const connectWebSocket = (onMessage) => {

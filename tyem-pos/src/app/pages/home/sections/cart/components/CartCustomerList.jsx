@@ -52,7 +52,7 @@ const CartCustomerList = ({ searchTerm, onSelectCustomer, selectedPhone, closeCu
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await axios.get("http://tyem.invenro.site/api/user/getCustomer");
+        const response = await axios.get("https://tyem.invenro.site/api/user/getCustomer");
         setCustomers(response.data.customers);
         setFilteredCustomers(response.data.customers);
       } catch (error) {

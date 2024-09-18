@@ -1,7 +1,7 @@
 export const drawerMenuLabels = {
   home: { label: "Home", path: "/" },
 
-  kds: { label: "KDS", path: "/kds" },
+  
 
   customers: { label: "CUSTOMERS", path: "/customers" },
 

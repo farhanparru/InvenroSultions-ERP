@@ -10,8 +10,8 @@ const {Server} = require('ws');
 
 app.use(cors({
     origin: [
-      "https://zaafaonlinestore.invenro.site",
-      "https://ventrues.invenro.site"
+      "http://localhost:5173",
+      "http://localhost:5173"
     ],
     methods: "GET,POST,PUT,DELETE,PATCH",
     credentials: true,

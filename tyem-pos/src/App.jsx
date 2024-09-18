@@ -29,7 +29,11 @@ import Employe from '../src/Adminpanle/Employe'
 import HomeTopBar from "./app/pages/home/sections/HomeTopBar";
 import HomeTableSection from "./app/pages/home/sections/body/components/HomeTableSection";
 import ResturentManagment from "./Adminpanle/ResturentManagment";
+import InventoryManagement from './Adminpanle/MangmentInventro'
+import AccountSettings from './Adminpanle/AccountSettings'
 import HomeTable from "./Adminpanle/HomeTable";
+import Devices from "./Adminpanle/SettingsNavbar/Devices";
+import DevicesList from "./KDS/DevicesList";
 
 
 
@@ -93,7 +97,8 @@ const App = () => {
 
 
  
-  const showLayout = ![ '/Sale', '/home','/Item','/Expense','/Customers','/Employes','/ResturentManagment','/:id/HomeTable'].includes(location.pathname);
+  const showLayout = ![ '/Sale', '/home','/Item','/Expense','/Customers','/Employes',
+    '/ResturentManagment','/:id/HomeTable','/AccountsSettings','/Inventromangment',"/devices",'/Kds'].includes(location.pathname);
 
   return (
     <div>
@@ -119,7 +124,10 @@ const App = () => {
               <Route path="/Customers" element={<Customer/>}/>
               <Route path="/ResturentManagment" element={<ResturentManagment/>}/>
               <Route path="/HomeTable/:id" element={<HomeTable />} />
-
+              <Route path="/AccountsSettings" element={<AccountSettings/>}/>
+              <Route path="/Inventromangment" element={<InventoryManagement/>}/>
+              <Route path="/devices" element={<Devices/>}/>
+              <Route path="/Kds" element={<DevicesList/>} />
             </Routes>
           )
         ) : (
@@ -139,7 +147,7 @@ const NonAuthRoutes = () => {
     <Routes>
       <Route path={drawerMenuLabels.online.path} exact element={<HomeOrdersSection/>}/>
       <Route path={drawerMenuLabels.home.path} exact element={<Login />} />
-      <Route path={drawerMenuLabels.kds.path} exact element={<KDS />} />
+    
       <Route path={drawerMenuLabels.home.path} exact element={<Home />} />
       
      
@@ -156,7 +164,7 @@ const AuthRoutes = () => {
       <Route path="/bill" exact element={<Print />} />
       <Route path="/scheduled-orders" element={<HomeOrdersSection />} />
       <Route path={drawerMenuLabels.home.path} exact element={<Home />} />
-      <Route path={drawerMenuLabels.kds.path} exact element={<KDS />} />
+
       <Route path={drawerMenuLabels.customers.path}exact
   element={<Customers isCart={false} />}
       />

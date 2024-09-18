@@ -7,14 +7,16 @@ const Floor = require("../Model/Floormodel");
 const Table = require("../Model/Hometablemodel");
 const Waiter = require("../Model/Waiterodermodel");
 const AddToSheetItem = require("../Model/catlogItemModel");
-const WebSocket = require("ws");
+const ItemDevices = require("../Model/Devicesmode");
+const POSItems = require("../Model/PosItemsmodel");
+const WebSocket = require("ws");                   
 const bcrypt = require("bcrypt");
 const axios = require("axios");
 const moment = require("moment-timezone");
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
 const path = require("path");
-const excelSheetDatas = require("../Model/ItemsModal");
+const ExcelSheetData = require("../Model/ItemsModal");
 const XLSX = require("xlsx");
 const mongoose = require("mongoose");
 require("dotenv").config();
@@ -404,7 +406,7 @@ module.exports = {
 
   SheetDataGet: async (req, res) => {
     try {
-      const items = await excelSheetDatas.find();
+      const items = await ExcelSheetData.find();
       res.status(200).json(items);
     } catch (error) {
       console.error(error);
@@ -583,7 +585,6 @@ module.exports = {
         message: `Table ${isBlocked ? "blocked" : "unblocked"} successfully`,
         data: updatedTable,
       });
-      
     } catch (error) {
       console.error("Error blocking/unblocking table:", error);
       res.status(500).json({
@@ -727,6 +728,115 @@ module.exports = {
       });
     }
   },
+
+  // POSItemscreate
+
+  POSItem: async (req, res) => {
+    try {
+      const { title, price, Itemcode, category, Device } = req.body;
+
+      // Validate required fields
+      if (!title || !price || !Itemcode || !category) {
+        return res.status(400).json({ msg: "All fields are required" });
+      }
+
+      // Check if the item with the same code already exists
+      const existingItem = await POSItems.findOne({ Itemcode });              
+      if (existingItem) {
+        return res
+          .status(400)
+          .json({ msg: "Item with this code already exists" });
+      }
+
+      // Create a new POS Item
+      const newItem = new POSItems({
+        title,
+        price,
+        Itemcode,
+        category,
+        Device,
+      });
+
+      // Save the item to the database
+      await newItem.save();
+
+      res
+        .status(201)
+        .json({ msg: "POS Item created successfully", item: newItem });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ msg: "Server Error" });
+    }
+  },
+
+  // getPosItemsAll
+
+  getPosItems:async(req,res)=>{
+  try {
+    const POSItemsALL = await POSItems.find();
+    res.status(200).json(POSItemsALL);
+  } catch (error) {
+    console.log('error all retrive Items');
+    
+  }
+  },
+
+
+
+  // create a ItemDevices
+
+  ItemDevices: async (req, res) => {
+    try {
+      const { Name, Location, Devices } = req.body;
+
+      // Validate that all required fields are present
+      if (!Name || !Location || !Devices) {
+        return res.status(400).json({ msg: "All fields are required" });
+      }
+      const DevicesCreateDate = moment().tz("Asia/Kolkata").format();
+
+
+      // Create a new ItemDevices document
+      const KdsDevices = new ItemDevices({
+        Name,
+        Location,
+        Devices,
+        DevicesCreateDate
+      });
+
+      // Save the document to the database
+      await KdsDevices.save();
+
+      // Return success response
+      return res.status(201).json({
+        msg: "Device successfully added",
+        KdsDevices,
+      });
+
+    } catch (error) {
+      // Log the error and return a 500 response with the error message
+      console.error("Error saving the device:", error);
+      return res.status(500).json({
+        msg: "Server error, please try again later",
+        error: error.message,
+      });
+    }
+  },
+
+  // get ItemDevices All
+
+  getDevices:async(req,res)=>{
+    try {
+      const AllDevices = await ItemDevices.find();
+      res.status(200).json(AllDevices);
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Error retrieving itemsDevices.");
+    }
+  },
+
+
+
 
   // POST request to add a new waiter entry
 

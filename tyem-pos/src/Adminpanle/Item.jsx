@@ -14,22 +14,42 @@ Modal.setAppElement("#root");
 const Item = () => {
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [category, setCategory] = useState("");
+  const [devices, setDevices] = useState([]); // State to store the list of devices
   const [openSidebarToggle, setOpenSidebarToggle] = useState(false);
   const [itemModalIsOpen, setItemModalIsOpen] = useState(false);
   const [categoryModalIsOpen, setCategoryModalIsOpen] = useState(false);
   const [excelModalIsOpen, setExcelModalIsOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownDirection, setDropdownDirection] = useState("down");
+  const [isOnlineAvailable, setIsOnlineAvailable] = useState(false);
+  const [isPosAvailable, setIsPosAvailable] = useState(false);
 
   // Form states
   const [title, setTitle] = useState("");
+
+  const [deviceName, setDeviceName] = useState(""); // State for selected device name
+
+  console.log(deviceName);
+
   const [description, setDescription] = useState("");
   const [availability, setAvailability] = useState("");
   const [condition, setCondition] = useState("");
+  const [Itemcode, setItemcode] = useState("");
+  const [category, setCategory] = useState("");
+  // console.log(category);
   const [price, setPrice] = useState(0);
   const [link, setLink] = useState("");
   const [brand, setBrand] = useState("");
   const [imageFile, setImageFile] = useState(null);
   const [id, setId] = useState(""); // Add a new state for the id
+
+  const handleDeviceChange = (e) => {
+    const selectedDeviceId = e.target.value;
+    const selectedDevice = devices.find(
+      (device) => device._id === selectedDeviceId
+    );
+    setDeviceName(selectedDevice ? selectedDevice.Name : ""); // Store only the device name
+  };
 
   const OpenSidebar = () => {
     setOpenSidebarToggle(!openSidebarToggle);
@@ -51,6 +71,22 @@ const Item = () => {
     setCategoryModalIsOpen(false);
   };
 
+  useEffect(() => {
+    if (dropdownOpen) {
+      const buttonElement = document.querySelector("button");
+      const { bottom, top } = buttonElement.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - bottom;
+      const spaceAbove = top;
+
+      // Set direction based on available space
+      if (spaceBelow < 160 && spaceAbove > 160) {
+        setDropdownDirection("up");
+      } else {
+        setDropdownDirection("down");
+      }
+    }
+  }, [dropdownOpen]);
+
   const customStyles = {
     content: {
       top: "50%",
@@ -60,7 +96,7 @@ const Item = () => {
       marginRight: "-50%",
       transform: "translate(-50%, -50%)",
       width: "40%", // Adjust the width as needed
-      height: "60%",
+      height: "70%",
     },
   };
 
@@ -71,6 +107,30 @@ const Item = () => {
     console.log("Uploaded Excel Data:", data);
     // Process the data as needed, for example:
   };
+
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8000/api/user/ExcelItems"
+        );
+        const items = response.data;
+
+        // Extract unique categories
+        const uniqueCategories = [
+          ...new Set(items.map((item) => item.category)),
+        ];
+
+        // Set the categories in state
+        setCategories(uniqueCategories);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     axios
@@ -100,56 +160,105 @@ const Item = () => {
     e.preventDefault();
 
     const formData = new FormData();
-    formData.append("id", id);
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("availability", availability);
-    formData.append("condition", condition);
-    formData.append("price", price);
-    formData.append("link", link);
-    formData.append("brand", brand);
-    formData.append("imageFile", imageFile);
 
-    if (!imageFile) {
-      alert("Please upload an image.");
-      return;
+    // Online Availability
+    if (isOnlineAvailable) {
+      formData.append("id", id);
+      formData.append("title", title);
+      formData.append("description", description);
+      formData.append("availability", availability);
+      formData.append("condition", condition);
+      formData.append("price", price);
+      formData.append("link", link);
+      formData.append("brand", brand);
+      formData.append("imageFile", imageFile);
+
+      axios
+        .post("http://localhost:8000/api/user/addItem", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((response) => {
+          console.log("Online item added successfully:", response.data);
+          setItems([...items, response.data]); // Update items list
+          closeItemModal(); // Close modal
+          clearForm(); // Clear the form after submission
+          toast.success("Online item added successfully!");
+        })
+        .catch((error) => {
+          console.error("Error adding online item:", error);
+          toast.error("Error adding online item.");
+        });
+
+      // POS Availability
+    } else if (isPosAvailable) {
+      formData.append("title", title);
+      formData.append("price", price);
+      formData.append("Itemcode", Itemcode);  // Ensure exact field names match
+      formData.append("category", category);
+      formData.append("Device", deviceName);
+      
+      console.log("Form Data: ", { title, price, Itemcode, category, deviceName });
+
+      axios
+        .post("http://localhost:8000/api/user/POSItems", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((response) => {
+          console.log("POS item added successfully:", response.data);
+          setItems([...items, response.data]); // Update items list
+          closeItemModal(); // Close modal
+          clearForm(); // Clear the form after submission
+          toast.success("POS item added successfully!");
+        })
+        .catch((error) => {
+          console.error("Error adding POS item:", error);
+          toast.error("Error adding POS item.");
+        });
+    } else {
+      alert("Please select at least one availability option (Online or POS).");
     }
+  };
 
-    axios
-      .post("https://tyem.invenro.site/api/user/addItem", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then((response) => {
-        console.log("Item added successfully:", response.data);
-        setItems([...items, response.data]); // Update items
-        closeItemModal(); // Close modal
-
-        // Clear form fields
-        setId("");
-        setTitle("");
-        setDescription("");
-        setAvailability("");
-        setCondition("");
-        setPrice("");
-        setLink("");
-        setBrand("");
-        setImageFile(null);
-
-        // Show success toast
-        toast.success("Item added successfully!");
-      })
-      .catch((error) => {
-        console.error("There was an error adding the item!", error);
-        toast.error("Error adding item!");
-      });
+  // Helper function to clear the form fields
+  const clearForm = () => {
+    setId("");
+    setTitle("");
+    setDescription("");
+    setAvailability("");
+    setCondition("");
+    setPrice("");
+    setLink("");
+    setBrand("");
+    setImageFile(null);
+    setItemcode("");
+    setCategory("");
+    setSelectedDevice("");
   };
 
   // File input change handler
   const handleFileChange = (e) => {
     setImageFile(e.target.files[0]); // Store the selected file
   };
+
+  // Fetch all devices when the component mounts
+  useEffect(() => {
+    const fetchDevices = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8000/api/user/AllDevices"
+        );
+        setDevices(response.data); // Assuming the response is an array of devices
+      } catch (error) {
+        console.error("Error fetching devices:", error);
+      }
+    };
+
+    fetchDevices();
+  }, []);
 
   return (
     <div className="p-4 flex flex-col h-screen">
@@ -250,7 +359,6 @@ const Item = () => {
                 placeholder="Enter Item ID"
                 value={id}
                 onChange={(e) => setId(e.target.value)}
-                required
               />
             </div>
 
@@ -277,6 +385,89 @@ const Item = () => {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
+            </div>
+
+            {/* Item Code Field */}
+            <div className="mb-4">
+              <label className="block text-gray-700">Item Code *</label>
+              <input
+                type="text"
+                name="Itemcode"
+                className="p-2 border rounded w-full"
+                placeholder="Enter Item Code"
+                value={Itemcode}
+                onChange={(e) => setItemcode(e.target.value)}
+                required
+              />
+            </div>
+
+            {/* Select Category Field */}
+            <div className="mb-4">
+              <label className="block text-gray-700">Select Category *</label>
+              <div className="relative">
+                <button
+                  type="button"
+                  className="p-2 border rounded w-full text-left bg-white focus:outline-none focus:ring focus:border-blue-300"
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                >
+                  {category || "Select Category"}
+                </button>
+
+                {dropdownOpen && (
+                  <ul
+                    className={`absolute ${
+                      dropdownDirection === "up"
+                        ? "bottom-full mb-2"
+                        : "top-full mt-2"
+                    } w-full max-h-40 overflow-y-auto border rounded bg-white shadow-lg z-10`}
+                    style={{ maxHeight: "160px" }}
+                  >
+                    <li
+                      className="p-2 hover:bg-gray-200"
+                      value={categories}
+                      name="category"
+                      onChange={(e) => setCategory(e.target.value)}
+                    >
+                      Select Category
+                    </li>
+                    {categories.map((cat, index) => (
+                      <li
+                        key={index}
+                        className="p-2 hover:bg-gray-200 cursor-pointer"
+                        onClick={() => {
+                          setCategory(cat);
+                          setDropdownOpen(false);
+                        }}
+                      >
+                        {cat}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+
+            <div className="mb-4">
+              {/* Select Device Field */}
+              <label className="block text-gray-700">Select Device *</label>
+              <select
+                name="Device"
+                className="p-2 border rounded w-full"
+                value={
+                  devices.find((device) => device.Name === deviceName)?._id ||
+                  ""
+                }
+                onChange={handleDeviceChange}
+                required
+              >
+                <option value="">Select Device</option>
+                {devices.length > 0 &&
+                  devices.map((device, index) => (
+                    <option key={index} value={device._id}>
+                      {device.Name}
+                    </option>
+                  ))}
+              </select>
             </div>
 
             {/* Availability Field */}
@@ -336,7 +527,7 @@ const Item = () => {
                 placeholder="Enter Item Link"
                 value={link}
                 onChange={(e) => setLink(e.target.value)}
-                pattern="https://.*" // Optional pattern to ensure HTTPS links
+                pattern="https://.*"
                 title="Please enter a valid URL"
               />
             </div>
@@ -362,8 +553,39 @@ const Item = () => {
                 name="imageFile"
                 className="p-2 border rounded w-full"
                 onChange={handleFileChange}
-                required
               />
+            </div>
+
+            {/* isOnlineAvailable Checkbox */}
+            <div className="mb-4 flex items-center">
+              <input
+                type="checkbox"
+                name="isOnlineAvailable"
+                checked={isOnlineAvailable}
+                onChange={() => setIsOnlineAvailable(!isOnlineAvailable)}
+              />
+              <label className="ml-2 block text-gray-700">
+                <span className="material-icons text-green-500">
+                  check_circle
+                </span>
+                Is Online Available
+              </label>
+            </div>
+
+            {/* isPosAvailable Checkbox */}
+            <div className="mb-4 flex items-center">
+              <input
+                type="checkbox"
+                name="isPosAvailable"
+                checked={isPosAvailable}
+                onChange={() => setIsPosAvailable(!isPosAvailable)}
+              />
+              <label className="ml-2 block text-gray-700">
+                <span className="material-icons text-green-500">
+                  check_circle
+                </span>
+                Is POS Available
+              </label>
             </div>
           </div>
 

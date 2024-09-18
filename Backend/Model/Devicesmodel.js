@@ -20,4 +20,6 @@ const createDevicesSchema = new mongoose.Schema({
       },
 });
 
-module.exports = mongoose.model('Device', createDevicesSchema);
+const DevicesItem = mongoose.model('Device', createDevicesSchema);
+
+module.exports = DevicesItem;

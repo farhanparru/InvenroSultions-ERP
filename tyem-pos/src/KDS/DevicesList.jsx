@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { DateTime } from 'luxon';
+import { useParams } from 'react-router-dom';
 
 const DevicesList = () => {
+ 
   const [selectedDeviceId, setSelectedDeviceId] = useState(null); // State to track selected device
   const [devices, setDevices] = useState([]); // State to store devices data
 
@@ -17,7 +19,7 @@ const DevicesList = () => {
       }
     };
     fetchDevices();
-  }, []);
+  }, [id]);
 
   // Format device creation date and time using luxon
   const formatDateTime = (isoString) => {

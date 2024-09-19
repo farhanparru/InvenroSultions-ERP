@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { DateTime } from 'luxon';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const DevicesList = () => {
- 
+
   const [selectedDeviceId, setSelectedDeviceId] = useState(null); // State to track selected device
   const [devices, setDevices] = useState([]); // State to store devices data
-
+  const navigate = useNavigate();
   // Fetch data from API on component mount
   useEffect(() => {
     const fetchDevices = async () => {
@@ -19,7 +19,7 @@ const DevicesList = () => {
       }
     };
     fetchDevices();
-  }, [id]);
+  }, []);
 
   // Format device creation date and time using luxon
   const formatDateTime = (isoString) => {
@@ -32,9 +32,9 @@ const DevicesList = () => {
 
   // Handle row click to select and highlight a device
   const handleRowClick = (id) => {
-    setSelectedDeviceId(id);
+    navigate(`/Kds/${id}`); // Navigate to KdsGrid with device ID
   };
-
+  
   return (
     <div className="container mx-auto p-6">
       {/* Kitchen Display System Heading */}
@@ -67,10 +67,8 @@ const DevicesList = () => {
           {devices.map((device) => (
             <tr
               key={device._id}
-              onClick={() => handleRowClick(device._id)} // Set selected device on click
-              className={`border-b border-gray-200 hover:bg-gray-100 cursor-pointer ${
-                selectedDeviceId === device._id ? 'bg-blue-200' : ''
-              }`} // Highlight row if selected
+              onClick={() => handleRowClick(device._id)} // Navigate with device ID
+              className="border-b border-gray-200 hover:bg-gray-100 cursor-pointer"
             >
               <td className="py-3 px-6 text-left">{device.Name}</td>
               <td className="py-3 px-6 text-left">{device.Location}</td>

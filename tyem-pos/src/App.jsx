@@ -34,6 +34,9 @@ import AccountSettings from './Adminpanle/AccountSettings'
 import HomeTable from "./Adminpanle/HomeTable";
 import Devices from "./Adminpanle/SettingsNavbar/Devices";
 import DevicesList from "./KDS/DevicesList";
+import NavbarWithSidebar from "./KDS/NavbarWithSidebar";
+import KdsGrid from "./KDS/KdsGrid";
+
 
 
 
@@ -98,7 +101,7 @@ const App = () => {
 
  
   const showLayout = ![ '/Sale', '/home','/Item','/Expense','/Customers','/Employes',
-    '/ResturentManagment','/:id/HomeTable','/AccountsSettings','/Inventromangment',"/devices",'/Kds'].includes(location.pathname);
+    '/ResturentManagment','/:id/HomeTable','/AccountsSettings','/Inventromangment',"/devices",'/Kds','/DvList'].includes(location.pathname);
 
   return (
     <div>
@@ -126,8 +129,10 @@ const App = () => {
               <Route path="/HomeTable/:id" element={<HomeTable />} />
               <Route path="/AccountsSettings" element={<AccountSettings/>}/>
               <Route path="/Inventromangment" element={<InventoryManagement/>}/>
-              <Route path="/devices" element={<Devices/>}/>
-              <Route path="/Kds" element={<DevicesList/>} />
+              <Route path="/Kds" element={<NavbarWithSidebar/>}/>
+              <Route path="/devices" element={<Devices/>}/> 
+              <Route path="/DvList" element={<DevicesList/>} />
+              
             </Routes>
           )
         ) : (

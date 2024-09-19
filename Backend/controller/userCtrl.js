@@ -7,7 +7,7 @@ const Floor = require("../Model/Floormodel");
 const Table = require("../Model/Hometablemodel");
 const Waiter = require("../Model/Waiterodermodel");
 const AddToSheetItem = require("../Model/catlogItemModel");
-const ItemDevices = require("../Model/Devicesmodel");
+const ItemDevices = require("../Model/DeviceModel.js");
 const POSItems = require("../Model/PosItemsmodel");
 const WebSocket = require("ws");                   
 const bcrypt = require("bcrypt");
@@ -733,8 +733,10 @@ module.exports = {
 
   POSItem: async (req, res) => {
     try {
-      const { title, price, Itemcode, category, Device } = req.body;
-
+       
+      const { deviceId } = req.params; // Extract deviceId from params
+      const { title, price, Itemcode, category, deviceName } = req.body; // Extract deviceName from body
+  
       // Validate required fields
       if (!title || !price || !Itemcode || !category) {
         return res.status(400).json({ msg: "All fields are required" });
@@ -748,14 +750,24 @@ module.exports = {
           .json({ msg: "Item with this code already exists" });
       }
 
-      // Create a new POS Item
-      const newItem = new POSItems({
-        title,
-        price,
-        Itemcode,
-        category,
-        Device,
-      });
+      
+     // Find the device by deviceId
+     const device = await ItemDevices.findById(deviceId); // Look up the device
+     if (!device) {
+       return res.status(404).json({ msg: "Device not found" });
+     }
+   
+
+     // Create a new POS item and associate the device name from the request body
+     const newItem = new POSItems({
+      title,
+      price,
+      Itemcode,
+      category,
+      Device: deviceName, // Save the device name from the body
+      deviceId: device._id, // Save the device ID from the database
+    });
+
 
       // Save the item to the database
       await newItem.save();
@@ -771,15 +783,20 @@ module.exports = {
 
   // getPosItemsAll
 
-  getPosItems:async(req,res)=>{
-  try {
-    const POSItemsALL = await POSItems.find();
-    res.status(200).json(POSItemsALL);
-  } catch (error) {
-    console.log('error all retrive Items');
-    
-  }
+   getPosItemsByDevice:async (req, res) => {
+    try {
+      const { deviceId } = req.params; // Get device ID from URL params
+      const POSItemsFiltered = await POSItems.find({ deviceId }); // Filter items by device ObjectId
+      res.status(200).json(POSItemsFiltered);
+    } catch (error) {
+      console.error('Error retrieving filtered items:', error);
+      res.status(500).send('Internal Server Error');
+    }
   },
+  
+  
+  // Update router to include device ID parameter
+
 
 
 

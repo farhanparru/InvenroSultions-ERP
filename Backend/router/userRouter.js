@@ -25,8 +25,8 @@ router.get('/getFloor',userCtrl.getFloor)
 router.post('/WaiterOder',userCtrl.addWaiterOrder)
 router.get('/getWaIterOder',userCtrl.getWaIterOder)
 router.post('/:tableId/BlockedTable',userCtrl.blockTable)
-router.post('/POSItems',userCtrl.POSItem)
-router.get('/getPosItems',userCtrl.getPosItems)
+router.post("/createPosItem/:deviceId", userCtrl.POSItem);
+router.get('/:deviceId/getPosItems', userCtrl.getPosItemsByDevice);
 router.post('/Devices',userCtrl.ItemDevices)
 router.get('/AllDevices',userCtrl.getDevices)
 router.post('/:floorId/createTable',userCtrl.createTable)

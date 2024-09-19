@@ -19,9 +19,14 @@ const POSItemsSchema = new mongoose.Schema({
     required: true,
   },
   Device: {
-    type: String, // You can change this to Number or other types as needed
-    required: true, // If the device field is mandatory, otherwise set to `false`
-  }
+    type: String, // Store the device name
+    required: true,
+  },
+  deviceId: {
+    type: mongoose.Schema.Types.ObjectId, // Store the device ObjectId
+    ref: "ItemDevices", // Reference the ItemDevices model
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("POSItems", POSItemsSchema);

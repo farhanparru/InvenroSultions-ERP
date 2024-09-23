@@ -38,14 +38,13 @@ const CreateEmployeeModal = ({ isOpen, onClose }) => {
       return;
     }
 
-    // Validate location
     if (!formData.location) {
       toast.error('Location is required.');
       return;
     }
 
     try {
-      await axios.post('https://tyem.invenro.site/api/user/createEmploye', formData);
+      await axios.post('https://tyem.invenro.com/api/user/createEmploye', formData);
       toast.success('Employee created successfully!');
 
       // Clear form data

@@ -23,7 +23,7 @@ function Odersale() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get('https://tyem.invenro.site/api/user/PosOrder');
+        const response = await axios.get('https://tyem.invenro.com/api/user/PosOrder');
         console.log('API response:', response.data);
         if (response.status === 200 && Array.isArray(response.data)) {
           setOrders(response.data);

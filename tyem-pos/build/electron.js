@@ -21,7 +21,7 @@ function createWindow () {
   //   console.error("Failed to load index.html:", err);
   // });
 
-   win.loadURL('https://ventrues.invenro.site');
+   win.loadURL('https://ventrues.invenro.com');
 }
 
 app.whenReady().then(() => {

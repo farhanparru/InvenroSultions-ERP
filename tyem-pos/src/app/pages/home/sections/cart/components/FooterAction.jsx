@@ -121,7 +121,7 @@ const FooterActions = () => {
 
     try {
       const response = await axios.post(
-        "https://tyem.invenro.site/api/user/Posorder",
+        "https://tyem.invenro.com/api/user/Posorder",
         orderData
       );
       console.log("API response:", response); // Log the API response

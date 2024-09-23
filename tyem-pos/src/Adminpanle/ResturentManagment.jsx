@@ -32,7 +32,7 @@ const ResturentManagment = () => {
   const fetchFloors = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/user/getFloor"
+        "https://tyem.invenro.com/api/user/getFloor"
       );
       setFloors(response.data); // Set the fetched floors data
     } catch (error) {
@@ -56,7 +56,7 @@ const ResturentManagment = () => {
 
   const handleCreateSave = async () => {
     try {
-      await axios.post("http://localhost:8000/api/user/createFloor", floorForm);
+      await axios.post("https://tyem.invenro.com/api/user/createFloor", floorForm);
       setIsCreateModalVisible(false);
       fetchFloors(); // Refresh the list after saving
       setFloorForm({
@@ -92,7 +92,7 @@ const ResturentManagment = () => {
   const handleEditSave = async () => {
     try {
       await axios.put(
-        `http://localhost:8000/api/user/updateFloor/${selectedFloor.id}`,
+        `https://tyem.invenro.com/api/user/updateFloor/${selectedFloor.id}`,
         floorForm
       );
       setIsEditModalVisible(false);

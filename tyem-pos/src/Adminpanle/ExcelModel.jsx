@@ -19,7 +19,7 @@ const ExcelModel = ({ modalIsOpen, closeModal, onUpload }) => {
             formData.append('file', file);
       
             try {
-              const response = await axios.post('https://tyem.invenro.site/api/user/importexcel', formData, {
+              const response = await axios.post('https://tyem.invenro.com/api/user/importexcel', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
               });
               console.log(response,"hai");

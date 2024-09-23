@@ -52,7 +52,7 @@ const CartCustomerList = ({ searchTerm, onSelectCustomer, selectedPhone, closeCu
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await axios.get("https://tyem.invenro.site/api/user/getCustomer");
+        const response = await axios.get("https://tyem.invenro.com/api/user/getCustomer");
         setCustomers(response.data.customers);
         setFilteredCustomers(response.data.customers);
       } catch (error) {
@@ -90,7 +90,7 @@ const CartCustomerList = ({ searchTerm, onSelectCustomer, selectedPhone, closeCu
       const phoneCode = countryToPhoneCode[countryCode];
       const formattedNumber = `+${phoneCode} ${newCustomerPhone}`;
 
-      const response = await axios.post("https://tyem.invenro.site/api/user/addCustomer", {
+      const response = await axios.post("https://tyem.invenro.com/api/user/addCustomer", {
         name: newCustomerName,
         number: formattedNumber,
         place: newCustomerPlace,

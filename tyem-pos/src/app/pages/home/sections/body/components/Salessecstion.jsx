@@ -470,7 +470,7 @@ const SalesSection = () => {
 
   // WebSocket for WhatsAppOrder real-time updates
   useEffect(() => {
-    const wsWhatsApp = new WebSocket("wss://tyem.invenro.site");
+    const wsWhatsApp = new WebSocket("wss://tyem.invenro.com");
 
     wsWhatsApp.onmessage = (event) => {
       const newOrder = JSON.parse(event.data);
@@ -489,7 +489,7 @@ const SalesSection = () => {
 
   // WebSocket for PosOrder real-time updates
   useEffect(() => {
-    const wsPosOrder = new WebSocket("wss://tyem.invenro.site/pos");
+    const wsPosOrder = new WebSocket("wss://tyem.invenro.com/pos");
 
     wsPosOrder.onmessage = (event) => {
       const newOrder = JSON.parse(event.data);
@@ -512,13 +512,13 @@ const SalesSection = () => {
       try {
         // Fetch WhatsApp Orders
         const responseWhatsApp = await axios.get(
-          "https://tyem.invenro.site/api/tyem/Whatsappget"
+          "https://tyem.invenro.com/api/user/Whatsappget"
         );
         console.log("WhatsApp API Response:", responseWhatsApp.data);
 
         // Fetch POS Orders
         const responsePosOrder = await axios.get(
-          "https://tyem.invenro.site/api/user/PosOrder"
+          "https://tyem.invenro.com/api/user/PosOrder"
         );
         console.log("POS API Response:", responsePosOrder.data);
 

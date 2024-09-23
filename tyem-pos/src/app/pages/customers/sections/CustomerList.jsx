@@ -15,7 +15,7 @@ const CustomerList = () => {
 
   useEffect(() => {
     // Fetch customers from the API
-    fetch("https://tyem.invenro.site/api/user/getCustomer")
+    fetch("https://tyem.invenro.com/api/user/getCustomer")
       .then((response) => response.json())
       .then((data) => {
         setCustomers(data.customers); // Assuming the data structure returned from the API

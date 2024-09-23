@@ -69,7 +69,7 @@ function Reports() {
   useEffect(() => {
     // Fetch POS Orders
     axios
-      .get("https://tyem.invenro.site/api/user/PosOrder")
+      .get("https://tyem.invenro.com/api/user/PosOrder")
       .then((response) => {
         const posData = response.data;
         let totalPosSales = 0;

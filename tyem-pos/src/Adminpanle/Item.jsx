@@ -134,7 +134,7 @@ const Item = () => {
 
   useEffect(() => {
     axios
-      .get("https://tyem.invenro.site/api/user/ExcelItems") // Adjust your API endpoint
+      .get("https://tyem.invenro.com/api/user/ExcelItems") // Adjust your API endpoint
       .then((response) => {
         setItems(response.data);
       })
@@ -146,7 +146,7 @@ const Item = () => {
   useEffect(() => {
     if (itemModalIsOpen) {
       axios
-        .get("https://tyem.invenro.site/api/user/getCategory")
+        .get("https://tyem.invenro.com/api/user/getCategory")
         .then((response) => {
           setCategories(response.data.categories);
         })
@@ -174,7 +174,7 @@ const Item = () => {
       formData.append("imageFile", imageFile);
 
       axios
-        .post("http://localhost:8000/api/user/addItem", formData, {
+        .post("https://tyem.invenro.com/api/user/addItem", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -202,7 +202,7 @@ const Item = () => {
       console.log("Form Data: ", { title, price, Itemcode, category, deviceName });
 
       axios
-        .post("http://localhost:8000/api/user/POSItems", formData, {
+        .post("https://tyem.invenro.com/api/user/POSItems", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -249,7 +249,7 @@ const Item = () => {
     const fetchDevices = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/user/AllDevices"
+          "https://tyem.invenro.com/api/user/AllDevices"
         );
         setDevices(response.data); // Assuming the response is an array of devices
       } catch (error) {

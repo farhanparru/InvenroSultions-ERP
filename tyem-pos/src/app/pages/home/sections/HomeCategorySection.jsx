@@ -20,7 +20,7 @@ const HomeCategorySection = ({ onCategorySelect }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('https://tyem.invenro.site/api/user/ExcelItems');
+        const response = await fetch('https://tyem.invenro.com/api/user/ExcelItems');
         const data = await response.json();
 
         const uniqueCategories = [...new Set(data.map(item => item.category))];

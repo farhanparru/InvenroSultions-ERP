@@ -45,7 +45,7 @@ const OrderItem = ({ order, onClick, selected }) => {
   const updateStatus = async (newStatus) => {
     try {
       const response = await axios.patch(
-        `https://tyem.invenro.site/api/user/PaymentStatus/${order._id}`,
+        `https://tyem.invenro.com/api/user/PaymentStatus/${order._id}`,
         { status: newStatus },
         {
           headers: {
@@ -298,7 +298,7 @@ const CartSection = ({
   const updatePaymentStatus = async (orderId, statusKey, statusValue) => {
     try {
       await axios.patch(
-        `https://tyem.invenro.site/api/user/PaymentStatus/${orderId}`,
+        `https://tyem.invenro.com/api/user/PaymentStatus/${orderId}`,
         {
           [statusKey]: statusValue,
         }

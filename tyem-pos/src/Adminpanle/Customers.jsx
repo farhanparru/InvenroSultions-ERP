@@ -22,7 +22,7 @@ const Customers = () => {
   const fetchCustomers = async () => {
     try {
       const response = await axios.get(
-        "https://tyem.invenro.site/api/user/getCustomer"
+        "https://tyem.invenro.com/api/user/getCustomer"
       );
       setCustomers(response.data.customers); // Assuming response has `customers` array
     } catch (error) {
@@ -54,7 +54,7 @@ const Customers = () => {
     e.preventDefault();
     try {
       await axios.post(
-        "https://tyem.invenro.site/api/user/createCustomer",
+        "https://tyem.invenro.com/api/user/createCustomer",
         newCustomer
       );
       closeModal(); // Close modal after successful submission

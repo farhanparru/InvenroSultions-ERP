@@ -894,7 +894,11 @@ module.exports = {
 
   editWaiterOrder: async (req, res) => {
     try {
-      const { oderId } = req.params;
+      const { oderId } = req.params; // If the route is defined with :oderId
+
+      console.log("Order ID:", oderId); // Debugging step to check oderId
+
+      
 
       const {
         billnumber,
@@ -907,14 +911,17 @@ module.exports = {
         customerName,
         priceCategory,
       } = req.body;
-      // Find the waiter order by its ID
-
-      const waiterOrder = Waiter.findById(oderId);
+  
+      
+      // Find the waiter order by its ID and wait for the result
+      const waiterOrder = await Waiter.findById(oderId);
+  
       if (!waiterOrder) {
         return res.status(404).json({
           message: "Waiter order not found",
         });
       }
+  
       // Update the order fields with the new values
       waiterOrder.billnumber = billnumber || waiterOrder.billnumber;
       waiterOrder.tableIds = tableIds || waiterOrder.tableIds; // Update only if provided
@@ -926,10 +933,10 @@ module.exports = {
       waiterOrder.customerName = customerName || waiterOrder.customerName;
       waiterOrder.priceCategory = priceCategory || waiterOrder.priceCategory;
       waiterOrder.OdercreateDate = moment().tz("Asia/Kolkata").format(); // Update the order date
-
+  
       // Save the updated order
       await waiterOrder.save();
-
+  
       // Send a success response
       res.status(200).json({
         message: "Waiter order updated successfully",
@@ -943,6 +950,7 @@ module.exports = {
       });
     }
   },
+  
 
   // getWaIterOder
 

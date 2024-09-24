@@ -31,8 +31,8 @@ router.post('/Devices',userCtrl.ItemDevices)
 router.get('/AllDevices',userCtrl.getDevices)
 router.post('/:floorId/createTable',userCtrl.createTable)
 router.get('/:floorId/getTables', userCtrl.getTablesByFloor);
-
 router.post('/addItem',userCtrl.addSheetItem)
+router.put('/WaiteOrder/:orderId',userCtrl.editWaiterOrder)
 
 
 

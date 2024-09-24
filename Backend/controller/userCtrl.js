@@ -9,7 +9,7 @@ const Waiter = require("../Model/Waiterodermodel");
 const AddToSheetItem = require("../Model/catlogItemModel");
 const ItemDevices = require("../Model/DeviceModel.js");
 const POSItems = require("../Model/PosItemsmodel");
-const WebSocket = require("ws");                   
+const WebSocket = require("ws");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
 const moment = require("moment-timezone");
@@ -733,41 +733,37 @@ module.exports = {
 
   POSItem: async (req, res) => {
     try {
-       
       const { deviceId } = req.params; // Extract deviceId from params
       const { title, price, Itemcode, category, deviceName } = req.body; // Extract deviceName from body
-  
+
       // Validate required fields
       if (!title || !price || !Itemcode || !category) {
         return res.status(400).json({ msg: "All fields are required" });
       }
 
       // Check if the item with the same code already exists
-      const existingItem = await POSItems.findOne({ Itemcode });              
+      const existingItem = await POSItems.findOne({ Itemcode });
       if (existingItem) {
         return res
           .status(400)
           .json({ msg: "Item with this code already exists" });
       }
 
-      
-     // Find the device by deviceId
-     const device = await ItemDevices.findById(deviceId); // Look up the device
-     if (!device) {
-       return res.status(404).json({ msg: "Device not found" });
-     }
-   
+      // Find the device by deviceId
+      const device = await ItemDevices.findById(deviceId); // Look up the device
+      if (!device) {
+        return res.status(404).json({ msg: "Device not found" });
+      }
 
-     // Create a new POS item and associate the device name from the request body
-     const newItem = new POSItems({
-      title,
-      price,
-      Itemcode,
-      category,
-      Device: deviceName, // Save the device name from the body
-      deviceId: device._id, // Save the device ID from the database
-    });
-
+      // Create a new POS item and associate the device name from the request body
+      const newItem = new POSItems({
+        title,
+        price,
+        Itemcode,
+        category,
+        Device: deviceName, // Save the device name from the body
+        deviceId: device._id, // Save the device ID from the database
+      });
 
       // Save the item to the database
       await newItem.save();
@@ -783,22 +779,18 @@ module.exports = {
 
   // getPosItemsAll
 
-   getPosItemsByDevice:async (req, res) => {
+  getPosItemsByDevice: async (req, res) => {
     try {
       const { deviceId } = req.params; // Get device ID from URL params
       const POSItemsFiltered = await POSItems.find({ deviceId }); // Filter items by device ObjectId
       res.status(200).json(POSItemsFiltered);
     } catch (error) {
-      console.error('Error retrieving filtered items:', error);
-      res.status(500).send('Internal Server Error');
+      console.error("Error retrieving filtered items:", error);
+      res.status(500).send("Internal Server Error");
     }
   },
-  
-  
+
   // Update router to include device ID parameter
-
-
-
 
   // create a ItemDevices
 
@@ -812,13 +804,12 @@ module.exports = {
       }
       const DevicesCreateDate = moment().tz("Asia/Kolkata").format();
 
-
       // Create a new ItemDevices document
       const KdsDevices = new ItemDevices({
         Name,
         Location,
         Devices,
-        DevicesCreateDate
+        DevicesCreateDate,
       });
 
       // Save the document to the database
@@ -829,7 +820,6 @@ module.exports = {
         msg: "Device successfully added",
         KdsDevices,
       });
-
     } catch (error) {
       // Log the error and return a 500 response with the error message
       console.error("Error saving the device:", error);
@@ -842,7 +832,7 @@ module.exports = {
 
   // get ItemDevices All
 
-  getDevices:async(req,res)=>{
+  getDevices: async (req, res) => {
     try {
       const AllDevices = await ItemDevices.find();
       res.status(200).json(AllDevices);
@@ -852,9 +842,6 @@ module.exports = {
     }
   },
 
-
-
-
   // POST request to add a new waiter entry
 
   addWaiterOrder: async (req, res) => {
@@ -862,7 +849,6 @@ module.exports = {
       // Destructure data from the request body
       const {
         billnumber,
-        OdercreateDate,
         tableIds, // These should now be ObjectIds
         items,
         subTotal,
@@ -873,6 +859,7 @@ module.exports = {
         priceCategory,
       } = req.body;
 
+      const OdercreateDate = moment().tz("Asia/Kolkata").format();
       // Create a new Waiter instance
       const newWaiterOrder = new Waiter({
         billnumber,
@@ -898,6 +885,60 @@ module.exports = {
       console.error("Error adding waiter order:", error);
       res.status(500).json({
         message: "Failed to add waiter order",
+        error: error.message,
+      });
+    }
+  },
+
+  // Edit waiter oder
+
+  editWaiterOrder: async (req, res) => {
+    try {
+      const { oderId } = req.params;
+
+      const {
+        billnumber,
+        tableIds, // These should now be ObjectIds
+        items,
+        subTotal,
+        tax,
+        total,
+        orderStatus,
+        customerName,
+        priceCategory,
+      } = req.body;
+      // Find the waiter order by its ID
+
+      const waiterOrder = Waiter.findById(oderId);
+      if (!waiterOrder) {
+        return res.status(404).json({
+          message: "Waiter order not found",
+        });
+      }
+      // Update the order fields with the new values
+      waiterOrder.billnumber = billnumber || waiterOrder.billnumber;
+      waiterOrder.tableIds = tableIds || waiterOrder.tableIds; // Update only if provided
+      waiterOrder.items = items || waiterOrder.items;
+      waiterOrder.subTotal = subTotal || waiterOrder.subTotal;
+      waiterOrder.tax = tax || waiterOrder.tax;
+      waiterOrder.total = total || waiterOrder.total;
+      waiterOrder.orderStatus = orderStatus || waiterOrder.orderStatus;
+      waiterOrder.customerName = customerName || waiterOrder.customerName;
+      waiterOrder.priceCategory = priceCategory || waiterOrder.priceCategory;
+      waiterOrder.OdercreateDate = moment().tz("Asia/Kolkata").format(); // Update the order date
+
+      // Save the updated order
+      await waiterOrder.save();
+
+      // Send a success response
+      res.status(200).json({
+        message: "Waiter order updated successfully",
+        waiterOrder,
+      });
+    } catch (error) {
+      console.error("Error editing waiter order:", error);
+      res.status(500).json({
+        message: "Failed to edit waiter order",
         error: error.message,
       });
     }

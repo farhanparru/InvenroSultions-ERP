@@ -65,7 +65,7 @@ const WaiterSchema = new mongoose.Schema({
   priceCategory: {
     type: String, // Category of price (e.g., "Regular", "Discount", etc.)
     required: true,
-    enum: ["Dine In", "Delivery", "Online","Parcel"] // Optional: restrict to specific categories
+    enum: ["DineIn", "Delivery", "Online","Parcel"] // Optional: restrict to specific categories
   }
 });
 

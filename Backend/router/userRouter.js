@@ -33,7 +33,7 @@ router.post('/:floorId/createTable',userCtrl.createTable)
 router.get('/:floorId/getTables', userCtrl.getTablesByFloor);
 router.post('/addItem',userCtrl.addSheetItem)
 router.put('/waiter-order/:oderId',userCtrl.editWaiterOrder);
-
+router.delete('/DeleteWaiterOrder/:oderId',userCtrl.DeleteWaiterOrder)
 
      
 module.exports = router        

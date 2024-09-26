@@ -1,111 +1,14 @@
-import React, { useState } from "react";
-import { FaUtensils, FaUser, FaReceipt, FaTable } from "react-icons/fa"; // Import the icon
+import React, { useState, useEffect } from "react";
+import { FaUtensils, FaUser, FaReceipt, FaTable } from "react-icons/fa"; 
+import axios from 'axios'
 
-const tables = [
-  {
-    id: 1,
-    status: "booked",
-    time: "09:18 AM",
-    label: "TABLE 01",
-    category: "Party Hall",
-  },
-  {
-    id: 2,
-    status: "booked",
-    time: "09:06 PM",
-    label: "TABLE 02",
-    category: "Ground Floor",
-  },
-  {
-    id: 3,
-    status: "bill",
-    time: "10:02 PM",
-    label: "TABLE 03",
-    category: "Party Hall",
-  },
-  { id: 4, status: "free", time: "", label: "TABLE 04", category: "Hall" },
-  {
-    id: 5,
-    status: "free",
-    time: "",
-    label: "TABLE 05",
-    category: "Ground Floor",
-  },
-  {
-    id: 6,
-    status: "free",
-    time: "",
-    label: "TABLE 06",
-    category: "Party Hall",
-  },
-  {
-    id: 7,
-    status: "free",
-    time: "",
-    label: "TABLE 07",
-    category: "Ground Floor",
-  },
-  { id: 8, status: "free", time: "", label: "TABLE 08", category: "Hall" },
-  {
-    id: 9,
-    status: "booked",
-    time: "02:59 PM",
-    label: "TABLE 09",
-    category: "Party Hall",
-  },
-  {
-    id: 10,
-    status: "free",
-    time: "",
-    label: "TABLE 10",
-    category: "Ground Floor",
-  },
-  {
-    id: 11,
-    status: "booked",
-    time: "12:56 PM",
-    label: "TABLE 11",
-    category: "Hall",
-  },
-  {
-    id: 12,
-    status: "free",
-    time: "",
-    label: "TABLE 12",
-    category: "Ground Floor",
-  },
-  { id: 13, status: "free", time: "", label: "TABLE 13", category: "Hall" },
-  {
-    id: 14,
-    status: "free",
-    time: "",
-    label: "TABLE 14",
-    category: "Party Hall",
-  },
-  {
-    id: 15,
-    status: "free",
-    time: "",
-    label: "TABLE 15",
-    category: "Ground Floor",
-  },
-  {
-    id: 16,
-    status: "free",
-    time: "",
-    label: "TABLE 16",
-    category: "Party Hall",
-  },
-];
-
-
-
-const getStatusColor = (status) => {
+const getStatusColor = (status, hasNewOrder) => {
+  if (hasNewOrder) return "bg-red-500"; // Red for tables with new orders
   switch (status) {
     case "booked":
-      return "bg-red-500"; // Red for booked tables
+      return "bg-green-500"; // Green for booked tables
     case "free":
-      return "bg-green-500"; // Green for free tables
+      return "bg-blue-500"; // Blue for free tables
     case "bill":
       return "bg-yellow-500"; // Yellow for bill
     default:
@@ -127,11 +30,52 @@ const getIcon = (status) => {
 };
 
 const HomeTableSection = () => {
+  const [tables, setTables] = useState([]); // Initialize table data
+  const [newOrderTables, setNewOrderTables] = useState([]); // Track tables with new orders
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
   };
+
+  // Fetch orders and find the tables with new orders
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get("https://loaclhsot:8000/api/user/getWaIterOder");
+      const data = await response.json();
+      
+      // Extract table IDs that have new orders
+      const newOrderTableIds = data.reduce((acc, order) => {
+        return [...acc, ...order.tableIds];
+      }, []);
+      
+      setNewOrderTables(newOrderTableIds);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+
+  // Fetch table data from API
+  const fetchTables = async () => {
+    try {
+      const response = await axios.get("https://localhost:8000/api/user/getTableData"); // Replace with the actual table API endpoint
+      console.log(response,"hiiii");
+      
+      const data = await response.json();
+      setTables(data); // Assuming `data` is the list of tables with their categories and labels
+    } catch (error) {
+      console.error("Error fetching tables:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTables(); // Fetch tables once on component mount
+    fetchOrders(); // Fetch orders as well
+
+    // Poll for new orders every 30 seconds (optional)
+    const interval = setInterval(fetchOrders, 30000);
+    return () => clearInterval(interval); // Cleanup on unmount
+  }, []);
 
   const filteredTables =
     selectedCategory === "All"
@@ -194,9 +138,10 @@ const HomeTableSection = () => {
       <div className="grid grid-cols-4 gap-4">
         {filteredTables.map((table) => (
           <div
-            key={table.id}
+            key={table._id} // Assuming the table object has an _id field
             className={`p-4 text-center text-white rounded ${getStatusColor(
-              table.status
+              table.status,
+              newOrderTables.includes(table._id) // Check if table has a new order
             )}`}
           >
             <div className="flex justify-center items-center mb-2">

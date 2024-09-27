@@ -10,7 +10,7 @@ const {Server} = require('ws');
 
 
 app.use(cors({
-    origin: ["http://localhost:5174"],
+    origin: "http://localhost:5173", // Replace with your frontend URL
     methods: "GET,POST,PUT,DELETE,PATCH",
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],

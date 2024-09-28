@@ -71,7 +71,7 @@ const HomeTopBar = ({ selectedTab }) => {
 
   return (
     <div>
-      <div className="w-full flex gap-6 px-4 py-2 bg-white shadow-md ml-[-195px]">
+      <div className="w-full flex gap-6 px-4 py-2 bg-white shadow-md ml-[-195px] " style={{marginBottom:"35px", marginTop:"-13px"}}>
         {homeBodySection.map((item) => {
           let isActive = item.slug === selectedTab;
           return <TextTab key={item.slug} active={isActive} item={item} />;

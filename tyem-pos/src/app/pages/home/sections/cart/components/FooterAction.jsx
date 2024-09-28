@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useReactToPrint } from "react-to-print";
 import { useDispatch, useSelector } from "react-redux";
 import { clearCart, setPaymentMethod } from "../../../store/cartSlice";
 import axios from "axios";
@@ -274,8 +273,8 @@ const FooterActions = () => {
       data: kotdata,
     };
 
-    ipcRenderer.send("print", JSON.stringify(finalData));
-    ipcRenderer.send("print2", JSON.stringify(kotfinalData));
+    // ipcRenderer.send("print", JSON.stringify(finalData));
+    // ipcRenderer.send("print2", JSON.stringify(kotfinalData));
   };
   const items = [
     {
@@ -546,19 +545,63 @@ const FooterActions = () => {
     setHoldCartModal(false);
   };
 
-  const printnodeThermal = async ({ orderData }) => {
-    console.log(orderData, "orderData");
 
-    try {
-      const response = await axios.post(
-        "https://tyem.invenro.site/api/print/salesPrint",
-        orderData
-      );
-      console.log("Print response:", response);
-    } catch (error) {
-      console.error("Error printing receipt:", error);
+  // const { ipcRenderer } = require('electron')
+  const data = [
+    {
+      // file path
+      position: 'center',                                  // position of image: 'left' | 'center' | 'right'
+      width: '160px',                                           // width of image in px; default: auto
+      height: '60px',                                          // width of image in px; default: 50 or '50px'
+    },
+    {
+      type: 'text',
+      value: 'SAMPLE HEADING',
+      style: { fontWeight: "700", textAlign: 'center', fontSize: "24px" }
+    },
+    {
+      type: 'text',
+      value: 'Secondary text',
+      style: { textDecoration: "underline", fontSize: "10px", textAlign: "center", color: "red" }
+    },
+    {
+      type: 'barCode',
+      value: '023456789010',
+      height: 40,
+      width: 2,
+      displayValue: true,
+      fontsize: 12,
+    },
+    {
+      type: 'qrCode',
+      value: 'https://github.com/Hubertformin/electron-pos-printer',
+      height: 55,
+      width: 55,
+      style: { margin: '10 20px 20 20px' }
+    },
+    {
+      type: 'table',
+      style: { border: '1px solid #ddd' },
+      tableHeader: ['Animal', 'Age'],
+      tableBody: [
+        ['Cat', 2],
+        ['Dog', 4],
+        ['Horse', 12],
+        ['Pig', 4],
+      ],
+      tableFooter: ['Animal', 'Age'],
+      tableHeaderStyle: { backgroundColor: '#000', color: 'white' },
+      tableBodyStyle: { 'border': '0.5px solid #ddd' },
+      tableFooterStyle: { backgroundColor: '#000', color: 'white' },
     }
-  };
+  ];
+
+  function printData() {
+      ipcRenderer.send('print', JSON.stringify(data))
+  }
+
+
+
 
   const [holdCartModal, setHoldCartModal] = useState(false);
 
@@ -958,13 +1001,14 @@ const FooterActions = () => {
 
                       setTimeout(() => {
                         placeOrder(2);
+                        printData(); // Call printData after placing the order
                       }, 200);
                     }}
                   >
-                    <p
+                  
+                      <p
                       className="text-sm font-semibold mt-[0.2rem] "
-                      onClick={printnodeThermal}
-                    >
+                   >
                       Receipt
                     </p>
                   </button>

@@ -36,6 +36,7 @@ import Devices from "./Adminpanle/SettingsNavbar/Devices";
 import DevicesList from "./KDS/DevicesList";
 import NavbarWithSidebar from "./KDS/NavbarWithSidebar";
 import KdsGrid from "./KDS/KdsGrid";
+import HoldingCartCard from "./app/pages/home/sections/body/components/HoldingCartCard";
 
 
 
@@ -132,6 +133,7 @@ const App = () => {
               <Route path="/Kds/:deviceId/" element={<NavbarWithSidebar/>}/>
               <Route path="/devices" element={<Devices/>}/> 
               <Route path="/DvList" element={<DevicesList/>} />
+              <Route path='/onHold' element={<HoldingCartCard/>} />
               
             </Routes>
           )

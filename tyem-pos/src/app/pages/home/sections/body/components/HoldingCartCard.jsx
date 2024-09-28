@@ -6,6 +6,8 @@ import { setSelectedCustomer } from "../../../store/customerSlice";
 import { selectTab } from "../../../store/homeSlice";
 
 const HoldingCartCard = ({ cart }) => {
+  console.log(cart,"HoldCart");
+  
   const dispatch = useDispatch();
 
   return (

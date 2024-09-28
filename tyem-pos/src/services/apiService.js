@@ -1,7 +1,7 @@
 // Backend API URL
-const API_URL = 'https://tyem.invenro.site/api/tyem/Whatsappget';
+const API_URL = 'https://tyem.invenro.com/api/tyem/Whatsappget';
 // WebSocket URL
-const WEBSOCKET_URL = 'wss://tyem.invenro.site';
+const WEBSOCKET_URL = 'wss://tyem.invenro.com';
 
 export const fetchOrders = async () => {
   try {

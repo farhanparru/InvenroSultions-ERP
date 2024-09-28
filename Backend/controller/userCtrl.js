@@ -624,6 +624,20 @@ module.exports = {
     }
   },
 
+
+  // getAllTables 
+
+  getAllTables: async (req, res) => {
+    try {
+      const getAllTables = await Table.find();
+      res.status(200).json({ data: getAllTables }); // Wrap response in an object with "data" field
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Error fetching tables" });
+    }
+  },
+  
+
   // Google Sheet Webhook URL
 
   addSheetItem: async (req, res) => {
@@ -875,6 +889,17 @@ module.exports = {
       });
       // Save the new order to the database
       await newWaiterOrder.save();
+
+
+          // Broadcast the new order to WebSocket clients (optional)
+    const wss = req.app.get('wss');
+    if (wss) {
+      wss.clients.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify(newWaiterOrder));
+        }
+      });
+    }
 
       // Send a success response
       res.status(201).json({

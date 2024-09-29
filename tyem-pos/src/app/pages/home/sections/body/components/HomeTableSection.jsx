@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaUtensils, FaUser, FaReceipt, FaTable } from "react-icons/fa";
-import HomeTopBar from "../../HomeTopBar";
 
 const getStatusColor = (status) => {
   switch (status) {
@@ -146,7 +145,6 @@ const HomeTableSection = () => {
 
   return (
     <div className="p-4">
-    <HomeTopBar />
       {/* Heading with Icon */}
       <div className="flex justify-center items-center mb-6">
         <FaTable className="text-3xl mr-2 text-blue-500" />

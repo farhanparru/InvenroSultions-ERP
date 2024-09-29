@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    body { background-color: white; height: 100%; width: 100%; }
+</style>
+<body>
+    <button onclick="printData()">Print</button>
+</body>
+<script>
+    const { ipcRenderer } = require('electron')
+    const data = [
+       {type: 'text', value: 'This is a sample print job', style: "font-size:16px; color:#3CAF50"},
+       {
+        type: 'barCode',
+        value: '023456789010',
+        height: 40,                      // height of barcode, applicable only to bar and QR codes
+        width: 2,                        // width of barcode, applicable only to bar and QR codes
+        displayValue: true,              // Display value below barcode
+        fontsize: 12,
+       },
+       {
+        type: 'qrCode',
+        value: 'https://github.com/Hubertformin/electron-pos-printer',
+        height: 55,
+        width: 55,
+        style: { margin: '10 20px 20 20px' }
+       }
+    ]
+    
+    function printData() {
+        ipcRenderer.send('print', JSON.stringify(data))
+    }
+</script>
+</html>

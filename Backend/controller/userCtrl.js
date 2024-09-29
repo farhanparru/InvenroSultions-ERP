@@ -992,6 +992,9 @@ module.exports = {
   getWaIterOder: async (req, res) => {
     try {
       const WaIterOder = await Waiter.find();
+
+      
+
       res.status(200).json(WaIterOder);
     } catch (error) {
       console.error(error);

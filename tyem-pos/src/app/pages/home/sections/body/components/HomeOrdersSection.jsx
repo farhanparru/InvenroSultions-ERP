@@ -467,24 +467,7 @@ const CartSection = ({
   // Status History Data
 
   const handlePrintReceipt = async (orderData, orderId) => {
-    console.log(orderData);
-
-    try {
-      // Sending the order data to the backend for printing
-      await axios.post(
-        "https://tyem.invenro.site/api/print/printreceipt",
-        orderData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      alert("Receipt printed successfully.");
-    } catch (error) {
-      console.error("Error printing receipt:", error);
-      alert("Failed to print receipt.");
-    }
+   
   };
 
   if (!order) {

@@ -18,7 +18,7 @@ const ItemCard = React.memo(({ selectedCategory }) => {
     const fetchItems = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/user/ExcelItems"
+          "https://tyem.invenro.com/api/user/ExcelItems"
         );
         const fetchedItems = response.data;
 

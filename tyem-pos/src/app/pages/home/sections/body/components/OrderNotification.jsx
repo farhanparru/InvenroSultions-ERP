@@ -13,7 +13,7 @@ const OrderNotification = ({ setOrders }) => {
     };
 
     useEffect(() => {
-        const socket = new WebSocket('wss://tyem.invenro.site'); // Use your backend's deployed domain
+        const socket = new WebSocket('wss://tyem.invenro.com'); // Use your backend's deployed domain
 
         socket.onmessage = (event) => {
             const newOrder = JSON.parse(event.data);

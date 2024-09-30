@@ -37,6 +37,7 @@ import DevicesList from "./KDS/DevicesList";
 import NavbarWithSidebar from "./KDS/NavbarWithSidebar";
 import KdsGrid from "./KDS/KdsGrid";
 import HoldingCartCard from "./app/pages/home/sections/body/components/HoldingCartCard";
+import HomeTableViewCart from "./app/pages/home/sections/body/components/HomeTableViewCart";
 
 
 
@@ -102,7 +103,7 @@ const App = () => {
 
  
   const showLayout = ![ '/Sale', '/home','/Item','/Expense','/Customers','/Employes',
-    '/ResturentManagment','/:id/HomeTable','/AccountsSettings','/Inventromangment',"/devices",'/Kds/:deviceId/','/DvList'].includes(location.pathname);
+    '/ResturentManagment','/:id/HomeTable','/AccountsSettings','/Inventromangment',"/devices",'/Kds/:deviceId/','/DvList',].includes(location.pathname);
 
   return (
     <div>
@@ -130,7 +131,7 @@ const App = () => {
               <Route path="/HomeTable/:id" element={<HomeTable />} />
               <Route path="/AccountsSettings" element={<AccountSettings/>}/>
               <Route path="/Inventromangment" element={<InventoryManagement/>}/>
-              <Route path="/Kds/:deviceId/" element={<NavbarWithSidebar/>}/>
+              <Route path="/Kds/:deviceId" element={<NavbarWithSidebar/>}/>
               <Route path="/devices" element={<Devices/>}/> 
               <Route path="/DvList" element={<DevicesList/>} />
               <Route path='/onHold' element={<HoldingCartCard/>} />
@@ -139,7 +140,7 @@ const App = () => {
           )
         ) : (
           <Routes>
-            <Route path="/bill" element={<Print />} />
+            {/* <Route path="/bill" element={<Print />} /> */}
           </Routes>
         )
       ) : (
@@ -154,10 +155,7 @@ const NonAuthRoutes = () => {
     <Routes>
       <Route path={drawerMenuLabels.online.path} exact element={<HomeOrdersSection/>}/>
       <Route path={drawerMenuLabels.home.path} exact element={<Login />} />
-    
       <Route path={drawerMenuLabels.home.path} exact element={<Home />} />
-      
-     
     </Routes>
   );
 };
@@ -167,30 +165,20 @@ const AuthRoutes = () => {
     <Routes>
       <Route path={drawerMenuLabels.online.path} exact element={<HomeOrdersSection/>}/>
       <Route path="/Home" element={<HomeItemsSection />} />
-      <Route path="/sales" element={<Salessecstion />} /> 
+      <Route path="/sales" element={<Salessecstion />} />
+      <Route path="/hometableviewcart/:tableId" element={<HomeTableViewCart/>} />  
       <Route path="/bill" exact element={<Print />} />
       <Route path="/scheduled-orders" element={<HomeOrdersSection />} />
       <Route path={drawerMenuLabels.home.path} exact element={<Home />} />
-
-      <Route path={drawerMenuLabels.customers.path}exact
-  element={<Customers isCart={false} />}
-      />
+      <Route path={drawerMenuLabels.customers.path} exactelement={<Customers isCart={false} />}/>
        <Route path="/" element={<HomeTopBar/>}/>
        <Route path="/tables" element={<HomeTableSection/>}/>
       {/* <Route path={drawerMenuLabels.sales.path} exact element={<Sales />} /> */}
       <Route path={drawerMenuLabels.orders.path} exact element={<Orders />} />
       <Route path={drawerMenuLabels.reports.path} exact element={<Reports />} />
       <Route path={drawerMenuLabels.cash.path} exact element={<Cash />} />
-      <Route
-        path={drawerMenuLabels.settings.path}
-        exact
-        element={<Settings />}
-      />
-      <Route
-        path={'on-hold'}
-        exact
-        element={<HoldOrder />}
-      />
+      <Route path={drawerMenuLabels.settings.path} exactelement={<Settings />}/>
+      <Route path={'on-hold'} exactelement={<HoldOrder />}/>
     </Routes>
   );
 };

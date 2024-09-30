@@ -624,8 +624,7 @@ module.exports = {
     }
   },
 
-
-  // getAllTables 
+  // getAllTables
 
   getAllTables: async (req, res) => {
     try {
@@ -636,7 +635,6 @@ module.exports = {
       res.status(500).json({ message: "Error fetching tables" });
     }
   },
-  
 
   // Google Sheet Webhook URL
 
@@ -890,16 +888,15 @@ module.exports = {
       // Save the new order to the database
       await newWaiterOrder.save();
 
-
-          // Broadcast the new order to WebSocket clients (optional)
-    const wss = req.app.get('wss');
-    if (wss) {
-      wss.clients.forEach(client => {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify(newWaiterOrder));
-        }
-      });
-    }
+      // Broadcast the new order to WebSocket clients (optional)
+      const wss = req.app.get("wss");
+      if (wss) {
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(newWaiterOrder));
+          }
+        });
+      }
 
       // Send a success response
       res.status(201).json({
@@ -992,13 +989,29 @@ module.exports = {
   getWaIterOder: async (req, res) => {
     try {
       const WaIterOder = await Waiter.find();
-
-      
-
       res.status(200).json(WaIterOder);
     } catch (error) {
       console.error(error);
       res.status(500).send("Error retrieving items.");
     }
   },
-};
+
+  // getWaiterOrderTablesId
+
+  getWaiterOrderTablesId: async (req, res) => {
+    try {
+      const { tableId } = req.params;
+
+      // Fetch orders where the provided tableId exists in the tableIds array
+      const orders = await Waiter.find({ tableIds: tableId });
+
+      if (!orders || orders.length === 0) {
+          return res.status(404).json({ message: 'No orders found for this table ID' });
+      }
+
+      res.status(200).json(orders);
+  } catch (error) {
+      res.status(500).json({ message: 'Error fetching orders', error });
+  }
+}
+}

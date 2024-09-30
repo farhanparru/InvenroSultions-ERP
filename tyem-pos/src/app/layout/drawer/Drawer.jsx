@@ -219,7 +219,7 @@ const Drawer = ({ activeMenu, setActiveMenu, collapsed }) => {
       collapsible
       width={120}
       collapsed={!collapsed}
-      className="bg-gray-900 h-[999px] fixed top-0 left-0" // Fixed position with full height
+      className="bg-gray-900 h-[1050px] fixed top-0 left-0" // Fixed position with full height
     >
       <div className="flex flex-col items-center py-4">
         <div className="flex items-center justify-center">

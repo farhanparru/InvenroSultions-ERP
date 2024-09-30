@@ -8,7 +8,6 @@ const bodyParser = require('body-parser');
 const userRouter = require('./router/userRouter')
 const {Server} = require('ws');
 
-
 app.use(cors({
     origin: ["https://invenro.com", "https://www.invenro.com"],
     methods: "GET,POST,PUT,DELETE,PATCH",

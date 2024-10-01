@@ -52,7 +52,7 @@ const CartCustomerList = ({ searchTerm, onSelectCustomer, selectedPhone, closeCu
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await axios.get("https://tyem.invenro.com/api/user/getCustomer");
+        const response = await axios.get("http://localhost:8000/api/user/getCustomer");
         setCustomers(response.data.customers);
         setFilteredCustomers(response.data.customers);
       } catch (error) {
@@ -97,7 +97,7 @@ const CartCustomerList = ({ searchTerm, onSelectCustomer, selectedPhone, closeCu
       });
 
       toast.success("Customer added successfully!", {
-        position: toast.POSITION.TOP_RIGHT,
+        position: toast?.POSITION?.TOP_RIGHT,
         autoClose: 3000,
       });
 
@@ -107,7 +107,7 @@ const CartCustomerList = ({ searchTerm, onSelectCustomer, selectedPhone, closeCu
       setNewCustomerPlace("");
       closeCustomerList();
 
-      const updatedResponse = await axios.get("http://localhost:8000/api/user/getCustomer");
+      const updatedResponse = await axios.get("https://tyem.invenro.com/api/user/getCustomer");
       setCustomers(updatedResponse.data.customers);
 
     } catch (error) {

@@ -172,16 +172,14 @@ const HomeTableSection = () => {
         <FaTable className="text-3xl mr-2 text-blue-500" />
         <h2 className="text-2xl font-semibold text-blue-500">Table Overview</h2>
       </div>
-
+  
       {/* Floor Selection Buttons */}
       <div className="mb-4">
         <div className="flex flex-wrap justify-center">
           <button
             onClick={() => handleFloorClick("All")}
             className={`px-4 py-2 mx-2 rounded ${
-              selectedFloorId === "All"
-                ? "bg-blue-500 text-white"
-                : "bg-gray-200"
+              selectedFloorId === "All" ? "bg-blue-500 text-white" : "bg-gray-200"
             }`}
           >
             All
@@ -201,13 +199,14 @@ const HomeTableSection = () => {
           ))}
         </div>
       </div>
+  
       {/* Table Layout with Vertical Scrollbar */}
-      <div className="overflow-y-auto h-96">
+      <div className="h-99 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600">
         <div className="grid grid-cols-4 gap-4">
           {updatedTables?.map((table) => (
             <div
               key={table.id}
-              onClick={table.status === "newOrder" ? () => handleTableClick(table.id) : null}  // Only allow click on new orders
+              onClick={table.status === "newOrder" ? () => handleTableClick(table.id) : null} // Only allow click on new orders
               className={`p-4 text-center text-white rounded ${getStatusColor(
                 table.status
               )}`}
@@ -233,6 +232,7 @@ const HomeTableSection = () => {
       </div>
     </div>
   );
+  
 };
 
 export default HomeTableSection;

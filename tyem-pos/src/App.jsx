@@ -170,7 +170,7 @@ const AuthRoutes = () => {
       <Route path="/bill" exact element={<Print />} />
       <Route path="/scheduled-orders" element={<HomeOrdersSection />} />
       <Route path={drawerMenuLabels.home.path} exact element={<Home />} />
-      <Route path={drawerMenuLabels.customers.path} exactelement={<Customers isCart={false} />}/>
+      <Route path={drawerMenuLabels.customers.path} exact element={<Customers/>}/>
        <Route path="/" element={<HomeTopBar/>}/>
        <Route path="/tables" element={<HomeTableSection/>}/>
       {/* <Route path={drawerMenuLabels.sales.path} exact element={<Sales />} /> */}

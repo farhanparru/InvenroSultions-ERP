@@ -10,15 +10,41 @@ const POSItemsSchema = new mongoose.Schema({
     required: true,
     min: 0,
   },
-  Itemcode: {
-    type: Number,
+  itemCode: {
+    type: String, // Changed to String for flexibility (e.g., leading zeros)
+    required: true,
+    unique: true, // Ensure uniqueness
+  },
+  itemVariation: {
+    type: String,
+    required: true,
+  },
+  itemPosition: {
+    type: String,
+    required: true,
+  },
+  alternateName: {
+    type: String,
+    required: true,
+  },
+  foodType: {
+    type: String,
+    required: true,
+  },
+  shortCode: {
+    type: String, // Changed to String for flexibility
+    required: true,
+  },
+  barCode: {
+    type: String,
     required: true,
   },
   category: {
     type: String,
     required: true,
+    index: true, // Index for faster queries on category
   },
-  Device: {
+  device: {
     type: String, // Store the device name
     required: true,
   },
@@ -27,6 +53,12 @@ const POSItemsSchema = new mongoose.Schema({
     ref: "ItemDevices", // Reference the ItemDevices model
     required: true,
   },
+}, {
+  timestamps: true, // Automatically add `createdAt` and `updatedAt` timestamps
 });
+
+// Adding index for price and itemCode for faster retrieval
+POSItemsSchema.index({ price: 1 });
+POSItemsSchema.index({ itemCode: 1 });
 
 module.exports = mongoose.model("POSItems", POSItemsSchema);

@@ -748,11 +748,7 @@ module.exports = {
       const { deviceId } = req.params; // Extract deviceId from params
       const { title, price, Itemcode, category, deviceName } = req.body; // Extract deviceName from body
 
-      // Validate required fields
-      if (!title || !price || !Itemcode || !category) {
-        return res.status(400).json({ msg: "All fields are required" });
-      }
-
+ 
       // Check if the item with the same code already exists
       const existingItem = await POSItems.findOne({ Itemcode });
       if (existingItem) {

@@ -63,6 +63,7 @@ const HomeTopBar = ({ selectedTab }) => {
               dispatch(clearEditOrder());
             }}
           >
+              
           </h3>
         </div>
       </Link>
@@ -71,7 +72,7 @@ const HomeTopBar = ({ selectedTab }) => {
 
   return (
     <div>
-      <div className="w-full flex gap-6 px-4 py-2 bg-white shadow-md ml-[-195px] " style={{marginBottom:"35px", marginTop:"-13px"}}>
+      <div className="w-full flex gap-6 px-4 py-2 bg-white shadow-md ml-[-195px]" style={{ marginBottom: "35px", marginTop: "-13px" }}>
         {homeBodySection.map((item) => {
           let isActive = item.slug === selectedTab;
           return <TextTab key={item.slug} active={isActive} item={item} />;
@@ -89,8 +90,11 @@ const HomeTopBar = ({ selectedTab }) => {
             `}
             onClick={() => {
               setSelectedButton(label);
+              
               if (label === "Tables") {
                 navigate('/tables'); // Navigate to the HomeTableSection route when "Tables" is clicked
+              } else if (label === "On Hold") {
+                navigate('/onHold'); // Navigate to the OnHold component route when "onHold" is clicked
               }
             }}
           >
@@ -100,6 +104,7 @@ const HomeTopBar = ({ selectedTab }) => {
       </div>
     </div>
   );
+  
 };
 
 export default HomeTopBar;

@@ -15,7 +15,6 @@ import KDS from "./app/pages/kds/KDS";
 import Login from "./app/pages/auth";
 import { getStoreUserData } from "./app/store/storeUser/storeUserSlice";
 import { useSelector } from "react-redux";
-import HoldOrder from "./app/pages/HoldOrders/HoldOrders";
 import Odersale from "./Adminpanle/Odersale";
 import FullWrapp from "./Adminpanle/Home/FullWrapp";
 import Item from "./Adminpanle/Item";
@@ -134,7 +133,7 @@ const App = () => {
               <Route path="/Kds/:deviceId" element={<NavbarWithSidebar/>}/>
               <Route path="/devices" element={<Devices/>}/> 
               <Route path="/DvList" element={<DevicesList/>} />
-              <Route path='/onHold' element={<HoldingCartCard/>} />
+              
               
             </Routes>
           )
@@ -167,6 +166,7 @@ const AuthRoutes = () => {
       <Route path="/Home" element={<HomeItemsSection />} />
       <Route path="/sales" element={<Salessecstion />} />
       <Route path="/hometableviewcart/:tableId" element={<HomeTableViewCart/>} />  
+      <Route path='/onHold' element={<HoldingCartCard/>} />
       <Route path="/bill" exact element={<Print />} />
       <Route path="/scheduled-orders" element={<HomeOrdersSection />} />
       <Route path={drawerMenuLabels.home.path} exact element={<Home />} />
@@ -178,7 +178,7 @@ const AuthRoutes = () => {
       <Route path={drawerMenuLabels.reports.path} exact element={<Reports />} />
       <Route path={drawerMenuLabels.cash.path} exact element={<Cash />} />
       <Route path={drawerMenuLabels.settings.path} exactelement={<Settings />}/>
-      <Route path={'on-hold'} exactelement={<HoldOrder />}/>
+     
     </Routes>
   );
 };

@@ -135,7 +135,7 @@ const HomeCartSection = () => {
     <div className="w-[35%] relative h-full bg-white text-white border-l-[3px] border-chicket-border flex flex-col">
       <div className="home__cart-top flex gap-3 ml-3 mr-3 mt-2 w-full overflow-x-scroll">
         {homePriceCategories.map((item, index) => {
-          const isSelected = item.id === selectedTab.id;
+          const isSelected = item.id === selectedTab?.id;
           return (
             <div key={index}>
               <div
@@ -159,7 +159,7 @@ const HomeCartSection = () => {
       </div> 
       <div className="search__section w-full flex gap-4 items-center mb-2 p-3">
       <div className="flex items-center justify-center space-x-2">
-        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 animate-bounce">
+        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-200 ">
           <FaUser className="text-black text-xl" />
         </div>
       </div>

@@ -8,9 +8,9 @@ const Table = require("../Model/Hometablemodel");
 const Waiter = require("../Model/Waiterodermodel");
 const AddToSheetItem = require("../Model/catlogItemModel");
 const ItemDevices = require("../Model/DeviceModel");
-const AdminRGR = require("../Model/AdminSignupModel");
+const Admin = require("../Model/AdminSignupmodel");
 const POSItems = require("../Model/PosItemsmodel");
-const Customeronlineorder = require("../Model/customerOnlineModal");
+const Customeronlineorder = require("../Model/customerOnlinemodel");
 const WebSocket = require("ws");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
@@ -1024,7 +1024,7 @@ module.exports = {
       const { selectBusinessType, email, phoneNumber, password } = req.body;
 
       // Check if admin already exists (to avoid duplicates)
-      const existingAdmin = await AdminRGR.findOne({ email });
+      const existingAdmin = await Admin.findOne({ email });
       if (existingAdmin) {
         return res
           .status(400)
@@ -1035,7 +1035,7 @@ module.exports = {
       // const hashedPassword = await bcrypt.hash(password, 10);
       // // New Database Document create
 
-      const newAdminRegister = new AdminRGR({
+      const newAdminRegister = new Admin({
         selectBusinessType: selectBusinessType,
         email: email,
         phoneNumber: phoneNumber,

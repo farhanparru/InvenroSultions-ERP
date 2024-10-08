@@ -10,7 +10,7 @@ const AddToSheetItem = require("../Model/catlogItemModel");
 const ItemDevices = require("../Model/DeviceModel.js");
 const AdminRGR = require("../Model/AdminSignupModel.js");
 const POSItems = require("../Model/PosItemsmodel");
-const customerOnlineorder = require("../Model/customerOnlineModal.js");
+const Customeronlineorder = require("../Model/customerOnlineModal.js");
 const WebSocket = require("ws");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
@@ -1165,7 +1165,7 @@ module.exports = {
       // Convert current date and time to IST
       const createOrderDate = moment().tz("Asia/Kolkata").format();
 
-      const newCustomeronlineOrder = customerOnlineorder({
+      const newCustomeronlineOrder = Customeronlineorder({
         items,
         totalAmount,
         orderStatus,

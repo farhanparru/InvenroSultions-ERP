@@ -8,8 +8,11 @@ const Table = require("../Model/Hometablemodel");
 const Waiter = require("../Model/Waiterodermodel");
 const AddToSheetItem = require("../Model/catlogItemModel");
 const ItemDevices = require("../Model/DeviceModel.js");
+const AdminRGR = require("../Model/AdminSignupModel.js");
 const POSItems = require("../Model/PosItemsmodel");
+const customerOnlineorder = require("../Model/customerOnlineModal.js");
 const WebSocket = require("ws");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
 const moment = require("moment-timezone");
@@ -20,6 +23,8 @@ const ExcelSheetData = require("../Model/ItemsModal");
 const XLSX = require("xlsx");
 const mongoose = require("mongoose");
 require("dotenv").config();
+
+const jwtSecret = process.env.TOKEN_SECRET_KEY;
 
 // Configure Cloudinary with credentials from .env
 cloudinary.config({
@@ -748,7 +753,6 @@ module.exports = {
       const { deviceId } = req.params; // Extract deviceId from params
       const { title, price, Itemcode, category, deviceName } = req.body; // Extract deviceName from body
 
- 
       // Check if the item with the same code already exists
       const existingItem = await POSItems.findOne({ Itemcode });
       if (existingItem) {
@@ -1002,12 +1006,195 @@ module.exports = {
       const orders = await Waiter.find({ tableIds: tableId });
 
       if (!orders || orders.length === 0) {
-          return res.status(404).json({ message: 'No orders found for this table ID' });
+        return res
+          .status(404)
+          .json({ message: "No orders found for this table ID" });
       }
 
       res.status(200).json(orders);
-  } catch (error) {
-      res.status(500).json({ message: 'Error fetching orders', error });
-  }
-}
-}
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching orders", error });
+    }
+  },
+
+  // Admin Register
+
+  AdminSignup: async (req, res) => {
+    try {
+      const { selectBusinessType, email, phoneNumber, password } = req.body;
+
+      // Check if admin already exists (to avoid duplicates)
+      const existingAdmin = await AdminRGR.findOne({ email });
+      if (existingAdmin) {
+        return res
+          .status(400)
+          .json({ message: "Admin with this email already exists." });
+      }
+
+      // // Hash password before saving
+      // const hashedPassword = await bcrypt.hash(password, 10);
+      // // New Database Document create
+
+      const newAdminRegister = new AdminRGR({
+        selectBusinessType: selectBusinessType,
+        email: email,
+        phoneNumber: phoneNumber,
+        password,
+      });
+
+      // Save to database
+      await newAdminRegister.save();
+
+      // Send response back to the client
+      res.status(201).json({
+        message: "Admin registered successfully",
+        admin: {
+          selectBusinessType: newAdminRegister.selectBusinessType,
+          email: newAdminRegister.email,
+          phoneNumber: newAdminRegister.phoneNumber,
+        },
+      });
+    } catch (error) {
+      console.error("Error during admin signup:", error);
+      res
+        .status(500)
+        .json({ message: "Server error. Please try again later." });
+    }
+  },
+
+  // AdminLogin
+
+  AdminLogin: async (req, res) => {
+    try {
+      const { email, password } = req.body;
+
+      // console.log(req.body, "req.body");
+
+      // Check if Admin exists
+      const admin = await AdminRGR.findOne({ email });
+      // console.log("Admin from DB:", admin);
+
+      if (!admin) {
+        return res.status(400).json({ message: "Invalid email or password." });
+      }
+
+      // console.log("Provided password:", password);
+      // console.log("Stored hashed password:", admin.password);
+
+      // Check if the password is present in the admin document
+      if (!admin.password) {
+        return res
+          .status(400)
+          .json({ message: "Password not set for this admin." });
+      }
+
+      // Compare the provided password with the hashed password in the database
+      const isPasswordValid = await bcrypt.compare(password, admin.password);
+      // console.log("Password valid:", isPasswordValid);
+
+      if (!isPasswordValid) {
+        return res
+          .status(401)
+          .json({ error: "error", message: "Incorrect password 🔐" });
+      }
+
+      // Generate JWT token
+      const token = jwt.sign(
+        { id: admin._id, isAdmin: true }, // Payload
+        jwtSecret,
+        { expiresIn: "1h" } // Token expiry
+      );
+
+      // Send success response with token
+      return res.status(200).json({
+        message: "Login successful",
+        token,
+        admin: {
+          email: admin.email,
+          phoneNumber: admin.phoneNumber,
+          selectBusinessType: admin.selectBusinessType,
+        },
+      });
+    } catch (error) {
+      console.error("Error during admin login:", error);
+      return res
+        .status(500)
+        .json({ message: "Server error. Please try again later." });
+    }
+  },
+
+  // Admin Logout
+
+  adminLogout: async (req, res) => {
+    try {
+      res
+        .status(200)
+        .json({ success: true, message: "Admin logged out successfully" });
+    } catch (error) {
+      console.error(error); // Better practice to use console.error for logging errors
+      res.status(500).json({
+        success: false,
+        message: "An error occurred while logging out.",
+      });
+    }
+  },
+
+  // Protacted Route
+
+  AdminProtacted: async (req, res) => {
+    res.status(200).json({
+      success: true,
+      message: "You are accessing a protected route!",
+    });
+  },
+
+  // CustomerOnlineorder
+
+  customerOnlineorder: async (req, res) => {
+    try {
+      const {
+        items,
+        totalAmount,
+        orderStatus,
+        customerName,
+        customerPhone,
+        orderNotes,
+      } = req.body;
+
+      // new Document create
+      // Convert current date and time to IST
+      const createOrderDate = moment().tz("Asia/Kolkata").format();
+
+      const newCustomeronlineOrder = customerOnlineorder({
+        items,
+        totalAmount,
+        orderStatus,
+        customerName,
+        customerPhone,
+        orderNotes,
+        createOrderDate,
+      });
+
+      // Save the new order to the database
+      await newCustomeronlineOrder.save();
+
+      // Broadcast the new order to all WebSocket clients
+      const wss = req.app.get("wss"); // Ensure WebSocket server is available
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify(newCustomeronlineOrder));
+        }
+      });
+
+      // Send success response
+      return res.status(201).json({
+        message: "Order created successfully",
+        order: newCustomeronlineOrder,
+      });
+
+    } catch (error) {
+      console.error("Error creating order:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  },
+};

@@ -37,7 +37,7 @@ const POSItemsSchema = new mongoose.Schema({
   },
   barCode: {
     type: String,
-    required: true,
+    required: false,
   },
   category: {
     type: String,

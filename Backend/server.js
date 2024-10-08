@@ -9,11 +9,12 @@ const userRouter = require('./router/userRouter')
 const {Server} = require('ws');
 
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin:['https://invenro.com', 'http://localhost:8080'],
     methods: "GET,POST,PUT,DELETE,PATCH",
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
 }));
+
 
 /// Middleware to parse JSON and form data
 app.use(bodyParser.json());
@@ -23,7 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // Use the userRouter for handling routes
 app.use('/api/user', userRouter);
 app.use('/api/tyem', userRouter);  // Use webhookRouter for handling webhook routes
-app.use('/api/print',userRouter) // node thermal printer
+app.use('/api/admin',userRouter)
 
 
    

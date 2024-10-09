@@ -7,7 +7,9 @@ const upload = multer({ dest: 'uploads/' }); // Temporary storage for uploaded f
 
 router.post('/Posorder', userCtrl.PosOrder);
 router.post('/WhatsappOrder', userCtrl.onlineOrder);
+router.post('/CreateTax', userCtrl.createTax)
 router.post('/customerOnline',userCtrl.customerOnlineorder)
+router.get('/getOnlineorder', userCtrl.getCustomerOrder)
 router.post('/Logout',userCtrl.adminLogout)
 router.post('/protacted',userCtrl.AdminProtacted)
 router.post('/Signup',userCtrl.AdminSignup)
@@ -19,7 +21,6 @@ router.get('/getCategory', userCtrl.getCategory)
 router.post('/addCustomer', userCtrl.addCustomer)
 router.get('/getCustomer', userCtrl.getCustomer);
 router.put('/orders/:id/status',userCtrl.statusUpdate)
-router.post('/Onlinecustomer',userCtrl.onlineCustomer)
 router.patch('/PaymentStatus/:id', userCtrl.paymentStatus);
 router.post('/importexcel', upload.single('file'),userCtrl.ImportExcel);
 router.get('/ExcelItems',userCtrl.SheetDataGet)    

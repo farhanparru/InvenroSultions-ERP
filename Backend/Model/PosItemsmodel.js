@@ -10,7 +10,7 @@ const POSItemsSchema = new mongoose.Schema({
     required: true,
     min: 0,
   },
-  itemCode: {
+  itemcode: {
     type: String, // Changed to String for flexibility (e.g., leading zeros)
     required: true,
     unique: true, // Ensure uniqueness
@@ -54,7 +54,7 @@ const POSItemsSchema = new mongoose.Schema({
     required: true,
   },
 }, {
-  timestamps: true, // Automatically add `createdAt` and `updatedAt` timestamps
+ 
 });
 
 // Adding index for price and itemCode for faster retrieval

@@ -7,8 +7,9 @@ const Floor = require("../Model/Floormodel");
 const Table = require("../Model/Hometablemodel");
 const Waiter = require("../Model/Waiterodermodel");
 const AddToSheetItem = require("../Model/catlogItemModel");
+const TaxItem = require("../Model/ItemTaxmodel");
 const ItemDevices = require("../Model/DeviceModel");
-const Admin = require("../Model/AdminSignupmodel");
+const Admin = require("../Model/Signupmodel");
 const POSItems = require("../Model/PosItemsmodel");
 const Customeronlineorder = require("../Model/customerOnlinemodel");
 const WebSocket = require("ws");
@@ -152,48 +153,6 @@ module.exports = {
     } catch (error) {
       console.error("Error processing order:", error);
       res.status(500).send("Internal Server Error");
-    }
-  },
-
-  // Online Customer
-
-  onlineCustomer: async (req, res) => {
-    try {
-      const { customerName, phoneNumber, Location } = req.body;
-
-      // Save the customer data to the database
-      const newCustomer = new customerOnline({
-        customerDetails: {
-          customerName,
-          phoneNumber,
-          Location,
-        },
-      });
-
-      const savedCustomer = await newCustomer.save();
-
-      console.log(savedCustomer, "savedCustomer");
-
-      // (Optional) Send acknowledgment back to XpressBot if needed
-      // await axios.post('XpressBot API URL', { ...response });
-
-      // Broadcast the new order to all WebSocket clients
-      const wss = req.app.get("wss");
-      if (wss) {
-        wss.clients.forEach((client) => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify(savedCustomer));
-          }
-        });
-      }
-
-      res.status(200).json({
-        message: "Customer data processed successfully",
-        savedCustomer,
-      });
-    } catch (error) {
-      console.error("Error processing customer data:", error);
-      res.status(500).json({ message: "Internal Server Error" });
     }
   },
 
@@ -751,10 +710,22 @@ module.exports = {
   POSItem: async (req, res) => {
     try {
       const { deviceId } = req.params; // Extract deviceId from params
-      const { title, price, Itemcode, category, deviceName } = req.body; // Extract deviceName from body
+      const {
+        title,
+        price,
+        itemcode,
+        category,
+        deviceName,
+        itemVariation,
+        foodType,
+        shortCode,
+        barCode,
+        alternateName,
+        itemPosition,
+      } = req.body; // Extract deviceName from body
 
       // Check if the item with the same code already exists
-      const existingItem = await POSItems.findOne({ Itemcode });
+      const existingItem = await POSItems.findOne({ itemcode });
       if (existingItem) {
         return res
           .status(400)
@@ -771,9 +742,15 @@ module.exports = {
       const newItem = new POSItems({
         title,
         price,
-        Itemcode,
+        itemcode,
         category,
-        Device: deviceName, // Save the device name from the body
+        itemVariation,
+        foodType,
+        shortCode,
+        barCode,
+        alternateName,
+        itemPosition,
+        device: deviceName, // Save the device name from the body
         deviceId: device._id, // Save the device ID from the database
       });
 
@@ -1071,7 +1048,7 @@ module.exports = {
       // console.log(req.body, "req.body");
 
       // Check if Admin exists
-      const admin = await AdminRGR.findOne({ email });
+      const admin = await Admin.findOne({ email });
       // console.log("Admin from DB:", admin);
 
       if (!admin) {
@@ -1191,9 +1168,57 @@ module.exports = {
         message: "Order created successfully",
         order: newCustomeronlineOrder,
       });
-
     } catch (error) {
       console.error("Error creating order:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  },
+
+  // get CustomerOnlineOrder
+
+  getCustomerOrder: async (req, res) => {
+    try {
+      const CustomerOnlineorders = await Customeronlineorder.find();
+      return res.status(200).json(CustomerOnlineorders);
+    } catch (error) {
+      console.error("Error retrieving orders:", error.message);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
+
+  //Tax created
+
+  createTax: async (req, res) => {
+    try {
+      const { Taxname, Percentage, TaxType } = req.body;
+      // Create a new tax Iten using the TaxItem model
+
+      // Ensure the Percentage has the "%" symbol
+      let percentageValue = Percentage.trim();
+      if (!percentageValue.endsWith("%")) {
+        percentageValue += "%"; // Append "%" if it's not included
+      }
+
+      const TaxcreateDate = moment().tz("Asia/Kolkata").format();
+      
+
+      const newTaxItem = new TaxItem({
+        Taxname,
+        Percentage: percentageValue, // Save the percentage with "%"
+        TaxType,
+        TaxcreateDate
+      });
+
+      // save the new Item to the database
+
+      await newTaxItem.save();
+      // Send success response
+      return res
+        .status(201)
+        .json({ message: "Tax item created successfully", tax: newTaxItem });
+    } catch (error) {
+      // Handle any errors
+      console.error(error);
       return res.status(500).json({ message: "Internal server error" });
     }
   },

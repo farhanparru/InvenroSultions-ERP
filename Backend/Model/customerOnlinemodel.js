@@ -57,7 +57,7 @@ const customerOnlineOrder = new mongoose.Schema({
 
   orderNotes: {
     type: String,
-    required: true,
+    required: false,
   },
 
   createOrderDate: {

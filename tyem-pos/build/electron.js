@@ -28,7 +28,7 @@ function createWindow () {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
-    webPreferences: {
+    webPreferences: {      
       nodeIntegration: true,
       contextIsolation: false, // Required for newer Electron versions
     }
@@ -38,7 +38,7 @@ function createWindow () {
   //   console.error("Failed to load index.html:", err);
   // });
 
-   win.loadURL('http://localhost:5173');
+   win.loadURL('http://localhost:3000');
 
   // Open the developer tools for debugging
   win.webContents.openDevTools();

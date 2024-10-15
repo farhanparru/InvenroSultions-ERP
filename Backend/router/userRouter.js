@@ -9,6 +9,7 @@ router.post('/Posorder', userCtrl.PosOrder);
 router.post('/WhatsappOrder', userCtrl.onlineOrder);
 router.post('/CreateTax', userCtrl.createTax)
 router.post('/customerOnline',userCtrl.customerOnlineorder)
+router.patch('/CustomerStatus/:id', userCtrl.StatusChange);
 router.get('/getOnlineorder', userCtrl.getCustomerOrder)
 router.post('/Logout',userCtrl.adminLogout)
 router.post('/protacted',userCtrl.AdminProtacted)

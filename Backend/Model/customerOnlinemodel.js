@@ -32,7 +32,7 @@ const customerOnlineOrder = new mongoose.Schema({
   orderStatus: {
     type: String,
     required: true,
-    enum: ["Placed", "Confirmed", "Ready", "Completed"],
+    enum: ["Placed", "Confirmed", "Ready", "Completed","Dispatch","Assignee"],
   },
 
   customerName: {

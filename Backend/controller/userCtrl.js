@@ -343,6 +343,45 @@ module.exports = {
     }
   },
 
+  // CustomerOnlineOrderStatus change
+
+  StatusChange: async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    try {
+      const validStatuses = [
+        "Placed",
+        "Confirmed",
+        "Ready",
+        "Completed",
+        "Dispatch",
+        "Assignee",
+      ];
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({ message: "Invalid order status!" });
+      }
+
+      // find Order By ID
+
+      const Order = await Customeronlineorder.findById(id);
+      // Check if the order exists
+      if (!Order) {
+        return res.status(404).json({ message: "Order not found!" });
+      }
+
+      // Update the order status
+      Order.orderStatus = status;
+
+      // Save the updated order
+      await Order.save();
+      // Return success response
+    res.status(200).json({ message: "Order status updated successfully!", Order });
+    } catch (error) {
+     // Handle any errors
+     res.status(500).json({ message: "Error updating order status", error: error.message });
+    }
+  },
+
   // ExcelSheet datas
 
   ImportExcel: async (req, res) => {
@@ -711,12 +750,16 @@ module.exports = {
     try {
       const { deviceId } = req.params; // Extract deviceId from params
       const {
-        title,
+        ID,
+        Itemname,
         price,
-        itemcode,
+        MRP,
         category,
         deviceName,
-        itemVariation,
+        description,
+        alternateDescription,
+        ItemnameVariation,
+        alternateItemnameVariation,
         foodType,
         shortCode,
         barCode,
@@ -725,7 +768,7 @@ module.exports = {
       } = req.body; // Extract deviceName from body
 
       // Check if the item with the same code already exists
-      const existingItem = await POSItems.findOne({ itemcode });
+      const existingItem = await POSItems.findOne({ shortCode });
       if (existingItem) {
         return res
           .status(400)
@@ -740,13 +783,17 @@ module.exports = {
 
       // Create a new POS item and associate the device name from the request body
       const newItem = new POSItems({
-        title,
+        ID,
+        Itemname,
         price,
-        itemcode,
+        MRP,
         category,
-        itemVariation,
+        ItemnameVariation,
         foodType,
         shortCode,
+        description,
+        alternateDescription,
+        alternateItemnameVariation,
         barCode,
         alternateName,
         itemPosition,
@@ -1194,19 +1241,18 @@ module.exports = {
       // Create a new tax Iten using the TaxItem model
 
       // Ensure the Percentage has the "%" symbol
-      let percentageValue = Percentage.trim();
+      let percentageValue = String(Percentage).trim();
       if (!percentageValue.endsWith("%")) {
         percentageValue += "%"; // Append "%" if it's not included
       }
 
       const TaxcreateDate = moment().tz("Asia/Kolkata").format();
-      
 
       const newTaxItem = new TaxItem({
         Taxname,
         Percentage: percentageValue, // Save the percentage with "%"
         TaxType,
-        TaxcreateDate
+        TaxcreateDate,
       });
 
       // save the new Item to the database

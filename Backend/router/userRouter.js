@@ -35,8 +35,10 @@ router.get('/:tableId/getWaiterOrder',userCtrl.getWaiterOrderTablesId)
 router.post('/:tableId/BlockedTable',userCtrl.blockTable)
 router.post("/createPosItem/:deviceId", userCtrl.POSItem);
 router.get('/:deviceId/getPosItems', userCtrl.getPosItemsByDevice);
-router.post('/Devices',userCtrl.ItemDevices)
+router.post('/AddDevices',userCtrl.ItemDevices)
 router.get('/AllDevices',userCtrl.getDevices)
+router.delete('/deleteDevices/:devicesId', userCtrl.deleteDevice)
+router.put('/EditDevices/:DeviceId',userCtrl.EditDevices)
 router.post('/:floorId/createTable',userCtrl.createTable)
 router.get('/:floorId/getTables', userCtrl.getTablesByFloor);
 router.post('/addItem',userCtrl.addSheetItem)

@@ -354,8 +354,9 @@ module.exports = {
         "Confirmed",
         "Ready",
         "Completed",
-        "Dispatch",
-        "Assignee",
+        "Dispatched",
+        "Assigned",
+        "Printed"
       ];
       if (!validStatuses.includes(status)) {
         return res.status(400).json({ message: "Invalid order status!" });
@@ -826,43 +827,74 @@ module.exports = {
     }
   },
 
-  // Update router to include device ID parameter
+  
 
   // create a ItemDevices
 
   ItemDevices: async (req, res) => {
     try {
-      const { Name, Location, Devices } = req.body;
+      const { Name, Location, Devices, IPAddress } = req.body; 
 
-      // Validate that all required fields are present
+      const generateRandomID = () => {
+        return Math.floor(10000 + Math.random() * 90000);
+      };
+      
+      const generateRandomCode = () => {
+        return Math.random().toString(36).substr(2, 8).toUpperCase();
+      };
+      
+
       if (!Name || !Location || !Devices) {
         return res.status(400).json({ msg: "All fields are required" });
       }
+
       const DevicesCreateDate = moment().tz("Asia/Kolkata").format();
+      const ID = generateRandomID(); 
+      const Code = generateRandomCode(); 
 
       // Create a new ItemDevices document
       const KdsDevices = new ItemDevices({
         Name,
         Location,
         Devices,
+        IPAddress,
         DevicesCreateDate,
+        ID,
+        Code, 
       });
 
       // Save the document to the database
       await KdsDevices.save();
 
-      // Return success response
+    
       return res.status(201).json({
         msg: "Device successfully added",
         KdsDevices,
       });
     } catch (error) {
-      // Log the error and return a 500 response with the error message
-      console.error("Error saving the device:", error);
+  console.error("Error saving the device:", error);
       return res.status(500).json({
         msg: "Server error, please try again later",
         error: error.message,
       });
+    }
+  },
+
+
+  // Devicess Delete
+
+  deleteDevice:async(req,res)=>{
+    const {devicesId} = req.params
+    try {
+      const deviceDelete = await ItemDevices.findByIdAndDelete(devicesId)
+      if(!deviceDelete){
+        return res.status(404).json({message: "Devices Note found"})
+      }
+      return res.status(200).json({message:"Devices Deleted Successfuly"})
+
+    } catch (error) {
+      res.status(500).send("Error Deleted Devicess.");
+      
     }
   },
 
@@ -875,6 +907,44 @@ module.exports = {
     } catch (error) {
       console.error(error);
       res.status(500).send("Error retrieving itemsDevices.");
+    }
+  },
+
+  // Edit Devices
+
+  EditDevices: async(req,res)=>{
+    const {DeviceId} = req.params
+    try {
+
+      const {Name, Location, Devices, IPAddress} = req.body
+
+         // Find the waiter order by its ID and wait for the result
+      const devicess = await ItemDevices.findById(DeviceId);
+
+      if (! devicess) {
+        return res.status(404).json({
+          message: "Devices not found",
+        });
+      }
+
+     
+      devicess.Name = Name || devicess.Name;
+      devicess.Location = Location || devicess.Location;
+      devicess.Devices = Devices || devicess.Devices;
+      devicess.IPAddress = IPAddress || devicess.IPAddress;
+
+      // Save the updated order
+      await devicess.save();
+
+      // Send a success response
+      res.status(200).json({
+        message: "devicess updated successfully",
+        devicess,
+      });
+      
+    } catch (error) {
+      console.log(error);
+      
     }
   },
 

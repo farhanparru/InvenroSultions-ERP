@@ -356,7 +356,7 @@ module.exports = {
         "Completed",
         "Dispatched",
         "Assigned",
-        "Printed"
+        "Printed",
       ];
       if (!validStatuses.includes(status)) {
         return res.status(400).json({ message: "Invalid order status!" });
@@ -376,10 +376,14 @@ module.exports = {
       // Save the updated order
       await Order.save();
       // Return success response
-    res.status(200).json({ message: "Order status updated successfully!", Order });
+      res
+        .status(200)
+        .json({ message: "Order status updated successfully!", Order });
     } catch (error) {
-     // Handle any errors
-     res.status(500).json({ message: "Error updating order status", error: error.message });
+      // Handle any errors
+      res
+        .status(500)
+        .json({ message: "Error updating order status", error: error.message });
     }
   },
 
@@ -827,30 +831,27 @@ module.exports = {
     }
   },
 
-  
-
   // create a ItemDevices
 
   ItemDevices: async (req, res) => {
     try {
-      const { Name, Location, Devices, IPAddress } = req.body; 
+      const { Name, Location, Devices, IPAddress } = req.body;
 
       const generateRandomID = () => {
         return Math.floor(10000 + Math.random() * 90000);
       };
-      
+
       const generateRandomCode = () => {
         return Math.random().toString(36).substr(2, 8).toUpperCase();
       };
-      
 
       if (!Name || !Location || !Devices) {
         return res.status(400).json({ msg: "All fields are required" });
       }
 
       const DevicesCreateDate = moment().tz("Asia/Kolkata").format();
-      const ID = generateRandomID(); 
-      const Code = generateRandomCode(); 
+      const ID = generateRandomID();
+      const Code = generateRandomCode();
 
       // Create a new ItemDevices document
       const KdsDevices = new ItemDevices({
@@ -860,19 +861,18 @@ module.exports = {
         IPAddress,
         DevicesCreateDate,
         ID,
-        Code, 
+        Code,
       });
 
       // Save the document to the database
       await KdsDevices.save();
 
-    
       return res.status(201).json({
         msg: "Device successfully added",
         KdsDevices,
       });
     } catch (error) {
-  console.error("Error saving the device:", error);
+      console.error("Error saving the device:", error);
       return res.status(500).json({
         msg: "Server error, please try again later",
         error: error.message,
@@ -880,21 +880,18 @@ module.exports = {
     }
   },
 
-
   // Devicess Delete
 
-  deleteDevice:async(req,res)=>{
-    const {devicesId} = req.params
+  deleteDevice: async (req, res) => {
+    const { devicesId } = req.params;
     try {
-      const deviceDelete = await ItemDevices.findByIdAndDelete(devicesId)
-      if(!deviceDelete){
-        return res.status(404).json({message: "Devices Note found"})
+      const deviceDelete = await ItemDevices.findByIdAndDelete(devicesId);
+      if (!deviceDelete) {
+        return res.status(404).json({ message: "Devices Note found" });
       }
-      return res.status(200).json({message:"Devices Deleted Successfuly"})
-
+      return res.status(200).json({ message: "Devices Deleted Successfuly" });
     } catch (error) {
       res.status(500).send("Error Deleted Devicess.");
-      
     }
   },
 
@@ -912,22 +909,20 @@ module.exports = {
 
   // Edit Devices
 
-  EditDevices: async(req,res)=>{
-    const {DeviceId} = req.params
+  EditDevices: async (req, res) => {
+    const { DeviceId } = req.params;
     try {
+      const { Name, Location, Devices, IPAddress } = req.body;
 
-      const {Name, Location, Devices, IPAddress} = req.body
-
-         // Find the waiter order by its ID and wait for the result
+      // Find the waiter order by its ID and wait for the result
       const devicess = await ItemDevices.findById(DeviceId);
 
-      if (! devicess) {
+      if (!devicess) {
         return res.status(404).json({
           message: "Devices not found",
         });
       }
 
-     
       devicess.Name = Name || devicess.Name;
       devicess.Location = Location || devicess.Location;
       devicess.Devices = Devices || devicess.Devices;
@@ -941,10 +936,8 @@ module.exports = {
         message: "devicess updated successfully",
         devicess,
       });
-      
     } catch (error) {
       console.log(error);
-      
     }
   },
 
@@ -1336,6 +1329,70 @@ module.exports = {
       // Handle any errors
       console.error(error);
       return res.status(500).json({ message: "Internal server error" });
+    }
+  },
+
+  // getAllTaxes
+
+  getTax: async (req, res) => {
+    try {
+      const TaxessAll = await TaxItem.find();
+      return res.status(200).json(TaxessAll);
+    } catch (error) {
+      console.error("Error retrieving orders:", error.message);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  },
+
+  // Edit AllTaxes
+
+  EditTaxes: async (req, res) => {
+    const { TaxeID } = req.params;
+    console.log(TaxeID, "TaxeID");
+
+    try {
+      const { Taxname, Percentage, TaxType } = req.body;
+      console.log(req.body, "req.body");
+
+      // Find the waiter order by its ID and wait for the result
+      const taxes = await TaxItem.findById(TaxeID);
+      console.log(taxes, "taxes");
+      if (!taxes) {
+        return res.status(404).json({
+          message: "Taxes not found",
+        });
+      }
+
+      taxes.Taxname = Taxname || taxes.Taxname;
+      taxes.Percentage = Percentage || taxes.Percentage;
+      taxes.TaxType = TaxType || taxes.TaxType;
+
+      // Save the updated order
+      await taxes.save();
+
+      // Send a success response
+      res.status(200).json({
+        message: "Taxes updated successfully",
+        taxes,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  // DeleteAllTaxes
+
+  DeleteTax: async (req, res) => {
+    const { TaxeID } = req.params;
+    console.log(TaxeID, "TaxeID");
+    try {
+      const TaxDelete = await TaxItem.findByIdAndDelete(TaxeID);
+      if (!TaxDelete) {
+        return res.status(404).json({ message: "Tax Note found" });
+      }
+      return res.status(200).json({ message: "Tax Deleted Successfuly" });
+    } catch (error) {
+      res.status(500).send("Error Deleted Tax.");
     }
   },
 };

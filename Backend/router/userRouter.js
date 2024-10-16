@@ -7,7 +7,12 @@ const upload = multer({ dest: 'uploads/' }); // Temporary storage for uploaded f
 
 router.post('/Posorder', userCtrl.PosOrder);
 router.post('/WhatsappOrder', userCtrl.onlineOrder);
+       
+router.delete('/DeleteTax/:TaxeID', userCtrl.DeleteTax)
 router.post('/CreateTax', userCtrl.createTax)
+router.get('/getTaxes',userCtrl.getTax)
+router.put('/editTax/:TaxeID', userCtrl.EditTaxes)
+
 router.post('/customerOnline',userCtrl.customerOnlineorder)
 router.patch('/CustomerStatus/:id', userCtrl.StatusChange);
 router.get('/getOnlineorder', userCtrl.getCustomerOrder)

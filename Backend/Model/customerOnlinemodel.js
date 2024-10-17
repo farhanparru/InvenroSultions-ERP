@@ -24,6 +24,16 @@ const OnlineItemSchema = new mongoose.Schema({
 });
 
 const customerOnlineOrder = new mongoose.Schema({
+  Id: {
+    type: Number,
+    required: true,
+  },
+
+  OnlineorderDate: {
+    type: Date,
+    required: true,
+  },
+
   totalAmount: {
     type: Number,
     required: true,
@@ -32,7 +42,15 @@ const customerOnlineOrder = new mongoose.Schema({
   orderStatus: {
     type: String,
     required: true,
-    enum: ["Placed", "Confirmed", "Ready", "Completed","Dispatched","Assigned","Printed"],
+    enum: [
+      "Placed",
+      "Confirmed",
+      "Ready",
+      "Completed",
+      "Dispatched",
+      "Assigned",
+      "Printed",
+    ],
   },
 
   customerName: {
@@ -58,11 +76,6 @@ const customerOnlineOrder = new mongoose.Schema({
   orderNotes: {
     type: String,
     required: false,
-  },
-
-  createOrderDate: {
-    type: Date,
-    default: Date.now, // Store the current date as UTC
   },
 });
 

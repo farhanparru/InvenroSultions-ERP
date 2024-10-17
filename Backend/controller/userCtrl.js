@@ -400,7 +400,7 @@ module.exports = {
 
       // Save data to database
       for (const item of data) {
-        await excelSheetDatas.create(item);
+        await ExcelSheetData.create(item);
       }
 
       res.status(200).send("File processed and data saved.");
@@ -1241,6 +1241,8 @@ module.exports = {
     try {
       const {
         items,
+        Id,
+        OnlineorderDate,
         totalAmount,
         orderStatus,
         customerName,
@@ -1249,17 +1251,17 @@ module.exports = {
       } = req.body;
 
       // new Document create
-      // Convert current date and time to IST
-      const createOrderDate = moment().tz("Asia/Kolkata").format();
+   
 
       const newCustomeronlineOrder = Customeronlineorder({
         items,
+        Id,
+        OnlineorderDate,
         totalAmount,
         orderStatus,
         customerName,
         customerPhone,
         orderNotes,
-        createOrderDate,
       });
 
       // Save the new order to the database

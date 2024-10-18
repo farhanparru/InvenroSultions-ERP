@@ -358,7 +358,7 @@ module.exports = {
         "Assigned",
         "Printed",
         "Delivered",
-        "cancelled"
+        "cancelled",
       ];
       if (!validStatuses.includes(status)) {
         return res.status(400).json({ message: "Invalid order status!" });
@@ -750,8 +750,6 @@ module.exports = {
       });
     }
   },
-
-
 
   // POSItemscreate
 
@@ -1318,29 +1316,30 @@ module.exports = {
         .json({ message: "CustomerOnline Order delete successfuly" });
     } catch (error) {
       console.log(error);
-      
     }
   },
 
-
   // Edit CustomerOnlineItems Edit
 
-  CustomerOnlineItemsEdit:async(req,res)=>{
-    const {customerId} = req.params
-  try {
-    const { itemName,quantity,price,totalAmount,} = req.body;
-    const updateCustomerItems = await Customeronlineorder.findByIdAndUpdate(customerId)
+  CustomerOnlineItemsEdit: async (req, res) => {
+    const { customerId } = req.params;
+    try {
+      const { itemName, quantity, price, totalAmount } = req.body;
+      const updateCustomerItems = await Customeronlineorder.findByIdAndUpdate(
+        customerId
+      );
 
-    if (!updateCustomerItems) {
-      return res.status(404).json({
-        message: "Customer Online Orders not found",
-      });
-    }
+      if (!updateCustomerItems) {
+        return res.status(404).json({
+          message: "Customer Online Orders not found",
+        });
+      }
 
-    updateCustomerItems.itemName = itemName || updateCustomerItems.itemName;
-    updateCustomerItems.quantity = quantity || updateCustomerItems.quantity;
-    updateCustomerItems.price = price || updateCustomerItems.price;
-    updateCustomerItems.totalAmount = totalAmount || updateCustomerItems.totalAmount;
+      updateCustomerItems.itemName = itemName || updateCustomerItems.itemName;
+      updateCustomerItems.quantity = quantity || updateCustomerItems.quantity;
+      updateCustomerItems.price = price || updateCustomerItems.price;
+      updateCustomerItems.totalAmount =
+        totalAmount || updateCustomerItems.totalAmount;
 
       // Save the updated order
       await updateCustomerItems.save();
@@ -1350,14 +1349,10 @@ module.exports = {
         message: "Online CustomerOrder updated successfully",
         updateCustomerItems,
       });
-
-
-  } catch (error) {
-    console.log(error);
-    
-  }
+    } catch (error) {
+      console.log(error);
+    }
   },
-
 
   //Tax created
 

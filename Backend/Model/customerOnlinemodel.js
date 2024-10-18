@@ -1,10 +1,7 @@
 const mongoose = require("mongoose");
 
 const OnlineItemSchema = new mongoose.Schema({
-  id: {
-    type: String, // Unique identifier for each order item
-    required: true,
-  },
+
   itemName: {
     type: String,
     required: true,
@@ -50,6 +47,8 @@ const customerOnlineOrder = new mongoose.Schema({
       "Dispatched",
       "Assigned",
       "Printed",
+      "Delivered",
+      "cancelled"
     ],
   },
 

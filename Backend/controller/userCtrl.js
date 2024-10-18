@@ -1335,11 +1335,19 @@ module.exports = {
         });
       }
 
-      updateCustomerItems.itemName = itemName || updateCustomerItems.itemName;
-      updateCustomerItems.quantity = quantity || updateCustomerItems.quantity;
-      updateCustomerItems.price = price || updateCustomerItems.price;
-      updateCustomerItems.totalAmount =
-        totalAmount || updateCustomerItems.totalAmount;
+       updateCustomerItems.items = updateCustomerItems.items.map((item)=>{
+        if (item.itemName === itemName) {
+          return {
+            itemName: itemName || item.itemName,
+            quantity: quantity || item.quantity,
+            price: price || item.price,
+          };
+        }
+        return item; // Return the unchanged item if no match
+       })
+
+
+    updateCustomerItems.totalAmount = totalAmount || updateCustomerItems.totalAmount;
 
       // Save the updated order
       await updateCustomerItems.save();

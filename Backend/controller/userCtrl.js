@@ -1287,7 +1287,7 @@ module.exports = {
     }
   },
 
-  // get CustomerOnlineOrder
+
 
   getCustomerOrder: async (req, res) => {
     try {

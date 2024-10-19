@@ -1,5 +1,4 @@
 const POSorder = require("../Model/userModel");
-const OnlineOrder = require("../Model/onlineOrdermodel");
 const Category = require("../Model/Categorymodel");
 const EmployeSchema = require("../Model/Employemodel");
 const Customer = require("../Model/Customermodel");
@@ -11,7 +10,7 @@ const TaxItem = require("../Model/ItemTaxmodel");
 const ItemDevices = require("../Model/DeviceModel");
 const Admin = require("../Model/Signupmodel");
 const POSItems = require("../Model/PosItemsmodel");
-const Customeronlineorder = require("../Model/customerOnlinemodel");
+const onlineOrders = require('../Model/OnlinePlatfromOrders')
 const WebSocket = require("ws");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
@@ -95,7 +94,7 @@ module.exports = {
   },
 
   // Webhook endpoint to handle incoming orders
-  onlineOrder: async (req, res) => {
+  whatsAPPonlineOrder: async (req, res) => {
     try {
       const {
         order_id,
@@ -118,6 +117,7 @@ module.exports = {
 
       // Convert current date and time to IST
       const orderDate = moment().tz("Asia/Kolkata").format();
+
       // Construct order data
       const orderData = {
         orderDetails: orderDetails, // Store all products
@@ -138,7 +138,7 @@ module.exports = {
 
       // console.log(orderData);
       // Save order to database
-      const order = new OnlineOrder(orderData);
+      const order = new onlineOrders(orderData);
       await order.save();
 
       // Broadcast the new order to all WebSocket clients
@@ -160,7 +160,7 @@ module.exports = {
 
   fetchOnlineOrder: async (req, res) => {
     try {
-      const orders = await OnlineOrder.find();
+      const orders = await onlineOrders.find();
       res.json(orders);
       console.log(orders);
     } catch (error) {
@@ -1242,7 +1242,7 @@ module.exports = {
   customerOnlineorder: async (req, res) => {
     try {
       const {
-        items,
+        Items,
         Id,
         OnlineorderDate,
         totalAmount,
@@ -1254,8 +1254,8 @@ module.exports = {
 
       // new Document create
 
-      const newCustomeronlineOrder = Customeronlineorder({
-        items,
+      const newCustomeronlineOrder = onlineOrders({
+        Items,
         Id,
         OnlineorderDate,
         totalAmount,
@@ -1291,7 +1291,7 @@ module.exports = {
 
   getCustomerOrder: async (req, res) => {
     try {
-      const CustomerOnlineorders = await Customeronlineorder.find();
+      const CustomerOnlineorders = await onlineOrders.find();
       return res.status(200).json(CustomerOnlineorders);
     } catch (error) {
       console.error("Error retrieving orders:", error.message);
@@ -1304,7 +1304,7 @@ module.exports = {
   deleteCustomerOnline: async (req, res) => {
     const { customerId } = req.params;
     try {
-      const findCustomerOnline = await Customeronlineorder.findByIdAndDelete(
+      const findCustomerOnline = await onlineOrders.findByIdAndDelete(
         customerId
       );
       if (!findCustomerOnline) {
@@ -1324,10 +1324,12 @@ module.exports = {
   CustomerOnlineItemsEdit: async (req, res) => {
     const { customerId } = req.params;
     try {
-      const { itemName, quantity, price, totalAmount } = req.body;
-      const updateCustomerItems = await Customeronlineorder.findByIdAndUpdate(
-        customerId
-      );
+      const { totalAmount,items} = req.body;
+
+
+
+
+      const updateCustomerItems = await onlineOrders.findByIdAndUpdate(customerId);
 
       if (!updateCustomerItems) {
         return res.status(404).json({
@@ -1335,22 +1337,16 @@ module.exports = {
         });
       }
 
-       updateCustomerItems.items = updateCustomerItems.items.map((item)=>{
-        if (item.itemName === itemName) {
-          return {
-            itemName: itemName || item.itemName,
-            quantity: quantity || item.quantity,
-            price: price || item.price,
-          };
-        }
-        return item; // Return the unchanged item if no match
-       })
-
-
-    updateCustomerItems.totalAmount = totalAmount || updateCustomerItems.totalAmount;
+        
+      updateCustomerItems.items = items || updateCustomerItems.items;
+      updateCustomerItems.totalAmount = totalAmount || updateCustomerItems.subTotal;
+       
 
       // Save the updated order
       await updateCustomerItems.save();
+
+       // Log the result for debugging
+    console.log(updateCustomerItems.items, "Updated Items");
 
       // Send a success response
       res.status(200).json({

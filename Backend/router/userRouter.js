@@ -12,10 +12,20 @@ router.get('/PosOrder', userCtrl.getOrders);
 
 
 // Whatssapp Orders intgrate XpressBot
-router.post('/WhatsappOrder', userCtrl.onlineOrder);
+router.post('/WhatsappOrder', userCtrl. whatsAPPonlineOrder);
 router.get('/Whatsappget', userCtrl.fetchOnlineOrder)
 router.put('/orders/:id/status',userCtrl.statusUpdate)
 router.patch('/PaymentStatus/:id', userCtrl.paymentStatus);
+
+
+
+//CustomerOnline APPlication Orders 
+router.post('/customerOnline',userCtrl.customerOnlineorder)
+router.patch('/CustomerStatus/:id', userCtrl.StatusChange);
+router.get('/getOnlineorder', userCtrl.getCustomerOrder)
+router.delete('/deleteCustomer/:customerId', userCtrl.deleteCustomerOnline)
+router.put('/EditOrders/:customerId', userCtrl.CustomerOnlineItemsEdit)
+
 
 
 // ItemTaxe
@@ -25,12 +35,6 @@ router.get('/getTaxes',userCtrl.getTax)
 router.put('/editTax/:TaxeID', userCtrl.EditTaxes)
 
 
-//CustomerOnline Order
-router.post('/customerOnline',userCtrl.customerOnlineorder)
-router.patch('/CustomerStatus/:id', userCtrl.StatusChange);
-router.get('/getOnlineorder', userCtrl.getCustomerOrder)
-router.delete('/deleteCustomer/:customerId', userCtrl.deleteCustomerOnline)
-router.put('/EditOrders/:customerId', userCtrl.CustomerOnlineItemsEdit)
 
 
 // Admin Authentication

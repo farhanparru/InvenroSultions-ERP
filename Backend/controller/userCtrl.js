@@ -10,7 +10,7 @@ const TaxItem = require("../Model/ItemTaxmodel");
 const ItemDevices = require("../Model/DeviceModel");
 const Admin = require("../Model/Signupmodel");
 const POSItems = require("../Model/PosItemsmodel");
-const onlineOrders = require('../Model/OnlinePlatfromOrders')
+const onlineOrders = require("../Model/OnlinePlatfromOrders");
 const WebSocket = require("ws");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
@@ -104,10 +104,9 @@ module.exports = {
         customer_name,
         customer_phone_number,
         payment_status,
-        item_lines, // Extract item_lines from the request body
+        item_lines,
       } = req.body;
 
-      // Map item_lines to orderDetails structure
       const orderDetails = item_lines.map((item) => ({
         product_name: item.product_name,
         product_quantity: item.product_quantity,
@@ -118,15 +117,14 @@ module.exports = {
       // Convert current date and time to IST
       const orderDate = moment().tz("Asia/Kolkata").format();
 
-      // Construct order data
-      const orderData = {
-        orderDetails: orderDetails, // Store all products
+      const whatsappOrderData = {
+        orderDetails: orderDetails,
         orderMeta: {
           posOrderId: order_id,
           orderType: catalog_id,
           paymentMethod: payment_method,
           paymentTendered: cart_total,
-          orderDate: orderDate, // Save in IST
+          orderDate: orderDate,
           paymentStatus: payment_status,
         },
 
@@ -136,8 +134,11 @@ module.exports = {
         },
       };
 
-      // console.log(orderData);
-      // Save order to database
+      const orderData = {
+        whatsappOnlineOrder: [whatsappOrderData],
+      };
+
+      // Save the order to the database
       const order = new onlineOrders(orderData);
       await order.save();
 
@@ -149,20 +150,29 @@ module.exports = {
         }
       });
 
-      res.status(200).send("Order received");
+      res.status(200).send("WhatsAPP Orders Successfuly");
     } catch (error) {
       console.error("Error processing order:", error);
       res.status(500).send("Internal Server Error");
     }
   },
 
-  // Fetch Orders Endpoint
+  // Fetch WhatssappOnlineOrders  Endpoint
 
   fetchOnlineOrder: async (req, res) => {
     try {
-      const orders = await onlineOrders.find();
-      res.json(orders);
-      console.log(orders);
+      const WhatssappOnlineOrders = await onlineOrders.find(
+        {},
+        { whatsappOnlineOrder: 1 }
+      );
+
+      if (!WhatssappOnlineOrders.length) {
+        return res
+          .status(404)
+          .json({ message: "No Whatsapp online orders found." });
+      }
+
+      return res.status(200).json(WhatssappOnlineOrders);
     } catch (error) {
       console.error("Error fetching orders:", error);
       res.status(500).json({ message: "Error fetching orders", error });
@@ -281,12 +291,12 @@ module.exports = {
     }
   },
 
-  // payment status
+  // whtsapp Online Orders payment status
   statusUpdate: async (req, res) => {
     const { status } = req.body;
 
     try {
-      const order = await OnlineOrder.findByIdAndUpdate(
+      const order = await onlineOrders.findByIdAndUpdate(
         req.params.id,
         { paymentStatus: status },
         { new: true } // Return the updated order
@@ -324,7 +334,7 @@ module.exports = {
       }
 
       // Update the payment status in the database
-      const updatedOrder = await OnlineOrder.findByIdAndUpdate(
+      const updatedOrder = await onlineOrders.findByIdAndUpdate(
         id,
         { "orderMeta.paymentStatus": status },
         { new: true }
@@ -348,6 +358,7 @@ module.exports = {
   StatusChange: async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
+
     try {
       const validStatuses = [
         "Placed",
@@ -360,20 +371,24 @@ module.exports = {
         "Delivered",
         "cancelled",
       ];
+
       if (!validStatuses.includes(status)) {
         return res.status(400).json({ message: "Invalid order status!" });
       }
 
       // find Order By ID
 
-      const Order = await Customeronlineorder.findById(id);
+      const Order = await onlineOrders.findById(id);
       // Check if the order exists
       if (!Order) {
         return res.status(404).json({ message: "Order not found!" });
       }
 
-      // Update the order status
-      Order.orderStatus = status;
+      if (Order.customerOnlineOrder && Order.customerOnlineOrder.length > 0) {
+        Order.customerOnlineOrder[0].orderStatus = status;
+      } else {
+        return res.status(400).json({ message: "No customer order found!" });
+      }
 
       // Save the updated order
       await Order.save();
@@ -1252,9 +1267,8 @@ module.exports = {
         orderNotes,
       } = req.body;
 
-      // new Document create
-
-      const newCustomeronlineOrder = onlineOrders({
+      // Construct customerOnlineOrder data
+      const customerOrderData = {
         Items,
         Id,
         OnlineorderDate,
@@ -1263,6 +1277,11 @@ module.exports = {
         customerName,
         customerPhone,
         orderNotes,
+      };
+
+      // Create new Document with the customerOnlineOrder array
+      const newCustomeronlineOrder = new onlineOrders({
+        customerOnlineOrder: [customerOrderData], // Store customer order in an array field
       });
 
       // Save the new order to the database
@@ -1278,7 +1297,7 @@ module.exports = {
 
       // Send success response
       return res.status(201).json({
-        message: "Order created successfully",
+        message: "Customer order created successfully",
         order: newCustomeronlineOrder,
       });
     } catch (error) {
@@ -1287,12 +1306,20 @@ module.exports = {
     }
   },
 
-
-
   getCustomerOrder: async (req, res) => {
     try {
-      const CustomerOnlineorders = await onlineOrders.find();
-      return res.status(200).json(CustomerOnlineorders);
+      const customerOnlineOrders = await onlineOrders.find(
+        {},
+        { customerOnlineOrder: 1 }
+      );
+
+      if (!customerOnlineOrders.length) {
+        return res
+          .status(404)
+          .json({ message: "No customer online orders found." });
+      }
+
+      return res.status(200).json(customerOnlineOrders);
     } catch (error) {
       console.error("Error retrieving orders:", error.message);
       res.status(500).json({ message: "Internal server error" });
@@ -1302,12 +1329,17 @@ module.exports = {
   // deleteCustomerOnlineAll
 
   deleteCustomerOnline: async (req, res) => {
-    const { customerId } = req.params;
+    const { Id } = req.params;
+         
     try {
-      const findCustomerOnline = await onlineOrders.findByIdAndDelete(
-        customerId
-      );
-      if (!findCustomerOnline) {
+      // Find the document and remove the order with the specified Id from customerOnlineOrder array
+    const updatedOrder = await onlineOrders.findOneAndUpdate(
+      { "customerOnlineOrder.Id": Id }, // Find the document where the Id matches inside the array
+      { $pull: { customerOnlineOrder: { Id: Id } } }, // Pull the matching subdocument from the array
+      { new: true } // Return the updated document
+    );
+
+      if (!updatedOrder) {
         return res.status(404).json({ message: "OrderNotefound" });
       }
 
@@ -1322,36 +1354,48 @@ module.exports = {
   // Edit CustomerOnlineItems Edit
 
   CustomerOnlineItemsEdit: async (req, res) => {
-    const { customerId } = req.params;
+    const { Id } = req.params;
+
     try {
-      const { totalAmount,items} = req.body;
+      const { totalAmount, Items } = req.body;
 
+      
+      const updateCustomerOrder = await onlineOrders.findOne({
+        "customerOnlineOrder.Id": Id, // Search for the Id inside the array
+      });
 
+   
 
-
-      const updateCustomerItems = await onlineOrders.findByIdAndUpdate(customerId);
-
-      if (!updateCustomerItems) {
+      if (!updateCustomerOrder) {
         return res.status(404).json({
           message: "Customer Online Orders not found",
         });
       }
 
-        
-      updateCustomerItems.items = items || updateCustomerItems.items;
-      updateCustomerItems.totalAmount = totalAmount || updateCustomerItems.subTotal;
-       
+      // Find the specific order inside the customerOnlineOrder array
+      const orderToUpdate = updateCustomerOrder.customerOnlineOrder.find(
+        (order) => order.Id === parseInt(Id)
+      );
+
+      if (!orderToUpdate) {
+        return res.status(404).json({
+          message: "Order with the specified Id not found",
+        });
+      }
+
+      orderToUpdate.Items = Items || updateCustomerOrder.Items;
+      orderToUpdate.totalAmount =  totalAmount || updateCustomerOrder.totalAmount;
 
       // Save the updated order
-      await updateCustomerItems.save();
+      await updateCustomerOrder.save();
 
-       // Log the result for debugging
-    console.log(updateCustomerItems.items, "Updated Items");
+      // Log the result for debugging
+      console.log(updateCustomerOrder.Items, "Updated Items");
 
       // Send a success response
       res.status(200).json({
         message: "Online CustomerOrder updated successfully",
-        updateCustomerItems,
+        updateCustomerOrder,
       });
     } catch (error) {
       console.log(error);

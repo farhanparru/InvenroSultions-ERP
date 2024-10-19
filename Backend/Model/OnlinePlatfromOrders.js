@@ -9,12 +9,12 @@ const ITEMSCHEMA = new mongoose.Schema({
   quantity: {
     type: Number,
     required: true,
-    default: ""
+    default: 0  // Changed default to 0 as it's a number
   },
   price: {
     type: Number,
     required: true,
-    default: ""
+    default: 0  // Changed default to 0 as it's a number
   },
   notes: {
     type: String, 
@@ -22,42 +22,22 @@ const ITEMSCHEMA = new mongoose.Schema({
   },
 });
 
-const orderSchema = new mongoose.Schema({
-  orderDetails: [
-    {
-      product_name: { type: String, required: true , default: "",},
-      product_quantity: { type: Number, required: true,  default: "", },
-      product_currency: { type: String, required: true,  default: "", },
-      unit_price: { type: Number, required: true,  default: "", },
-    },
-  ],
-  orderMeta: {
-    posOrderId: { type: Number, required: true,  default: "", },
-    orderType: { type: String, required: true,  default: "", },
-    paymentMethod: { type: String, required: true,  default: "", },
-    paymentTendered: { type: Number, required: true,  default: "", },
-    orderDate: { type: Date, default: Date.now }, // Store date as UTC
-    paymentStatus: { type: String, default: 'Pending',  default: "", },
-  },
-  customer: {
-    name: { type: String, required: true,  default: "", },
-    phone: { type: String, required: true,  default: "", },
-  },
-  // Additional fields
+// Schema for customerOnlineOrder
+const customerOnlineOrderSchema = new mongoose.Schema({
   Id: {
     type: Number,
     required: true,
-    default: "",
+    default: 0,  // Changed default to 0 as it's a number
   },
   OnlineorderDate: {
     type: Date,
     required: true,
-    default: "",
+    default: Date.now,
   },
   totalAmount: {
     type: Number,
     required: true,
-    default: "",
+    default: 0,  // Changed default to 0 as it's a number
   },
   orderStatus: {
     type: String,
@@ -71,8 +51,9 @@ const orderSchema = new mongoose.Schema({
       "Assigned",
       "Printed",
       "Delivered",
-      "cancelled",
+      "Cancelled",
     ],
+    default: "Placed",  // Set default status
   },
   customerName: {
     type: String,
@@ -84,20 +65,52 @@ const orderSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: function (v) {
-        return /^\+?[1-9]\d{1,14}$/.test(v); // Regular expression to validate phone number with country code
+        return /^\+?[1-9]\d{1,14}$/.test(v);  // Validate phone number with country code
       },
       message: (props) => `${props.value} is not a valid phone number!`,
     },
+    default: "",
   },
   Items: {
-    type: [ITEMSCHEMA], // Array of OrderItem objects
+    type: [ITEMSCHEMA],  // Array of items
     required: true,
-    default: "",
+    default: [],
   },
   orderNotes: {
     type: String,
     required: false,
+    default: "",
   },
+});
+
+// Schema for whatsappOnlineOrder
+const whatsappOnlineOrderSchema = new mongoose.Schema({
+  orderDetails: [
+    {
+      product_name: { type: String, required: true, default: "" },
+      product_quantity: { type: Number, required: true, default: 0 },
+      product_currency: { type: String, required: true, default: "" },
+      unit_price: { type: Number, required: true, default: 0 },
+    },
+  ],
+  orderMeta: {
+    posOrderId: { type: Number, required: true, default: 0 },
+    orderType: { type: String, required: true, default: "" },
+    paymentMethod: { type: String, required: true, default: "" },
+    paymentTendered: { type: Number, required: true, default: 0 },
+    orderDate: { type: Date, default: Date.now },
+    paymentStatus: { type: String, default: "Pending" },
+  },
+  customer: {
+    name: { type: String, required: true, default: "" },
+    phone: { type: String, required: true, default: "" },
+  },
+});
+
+// Main schema combining both arrays
+const orderSchema = new mongoose.Schema({
+  customerOnlineOrder: [customerOnlineOrderSchema],  // Array for customer online orders
+  whatsappOnlineOrder: [whatsappOnlineOrderSchema],  // Array for WhatsApp online orders
 });
 
 // Export the model

@@ -23,8 +23,8 @@ router.patch('/PaymentStatus/:id', userCtrl.paymentStatus);
 router.post('/customerOnline',userCtrl.customerOnlineorder)
 router.patch('/CustomerStatus/:id', userCtrl.StatusChange);
 router.get('/getOnlineorder', userCtrl.getCustomerOrder)
-router.delete('/deleteCustomer/:customerId', userCtrl.deleteCustomerOnline)
-router.put('/EditOrders/:customerId', userCtrl.CustomerOnlineItemsEdit)
+router.delete('/deleteCustomer/:Id', userCtrl.deleteCustomerOnline)
+router.put('/EditOrders/:Id', userCtrl.CustomerOnlineItemsEdit)
 
 
 

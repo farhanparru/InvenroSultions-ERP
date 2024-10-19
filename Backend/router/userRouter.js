@@ -12,7 +12,7 @@ router.get('/PosOrder', userCtrl.getOrders);
 
 
 // Whatssapp Orders intgrate XpressBot
-router.post('/WhatsappOrder', userCtrl. whatsAPPonlineOrder);
+router.post('/WhatsappOrder', userCtrl.whatsAPPonlineOrder);
 router.get('/Whatsappget', userCtrl.fetchOnlineOrder)
 router.put('/orders/:id/status',userCtrl.statusUpdate)
 router.patch('/PaymentStatus/:id', userCtrl.paymentStatus);

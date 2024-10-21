@@ -135,7 +135,7 @@ module.exports = {
       };
 
       const orderData = {
-        whatsappOnlineOrder: [whatsappOrderData],
+       whatsappOnlineOrder: [whatsappOrderData],
       };
 
       // Save the order to the database
@@ -150,7 +150,7 @@ module.exports = {
         }
       });
 
-      res.status(200).send("WhatsAPP Orders Successfuly");
+      res.status(200).send("WhatsApp Order Successfully Processed");
     } catch (error) {
       console.error("Error processing order:", error);
       res.status(500).send("Internal Server Error");

@@ -138,19 +138,20 @@ module.exports = {
 
       // Create a new document with WhatsApp order data
       const newWhtssapponlineOrder = new onlineOrders({
-        whatsappOnlineOrder: [whatsappOrderData], // Store WhatsApp order in an array field
+        whatsappOnlineOrder: [whatsappOrderData], 
       });
 
-      // Save the order to the database
+    
       await newWhtssapponlineOrder.save();
 
-      // Broadcast the new order to all WebSocket clients
-      const wss = req.app.get("wss"); // Ensure WebSocket server is available
+   
+      const wss = req.app.get("wss");
       wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(JSON.stringify(whatsappOrderData));
         }
       });
+
 
       res.status(200).send("WhatsApp Order Successfully Processed");
     } catch (error) {

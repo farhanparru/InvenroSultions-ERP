@@ -87,23 +87,23 @@ const customerOnlineOrderSchema = new mongoose.Schema({
 const whatsappOnlineOrderSchema = new mongoose.Schema({
   orderDetails: [
     {
-      product_name: { type: String, required: true, default: "" },
-      product_quantity: { type: Number, required: true, default: 0 },
-      product_currency: { type: String, required: true, default: "" },
-      unit_price: { type: Number, required: true, default: 0 },
+      product_name: { type: String, required: true},
+      product_quantity: { type: Number, required: true },
+      product_currency: { type: String, required: true },
+      unit_price: { type: Number, required: true },
     },
   ],
   orderMeta: {
-    posOrderId: { type: Number, required: true, default: 0 },
-    orderType: { type: String, required: true, default: "" },
-    paymentMethod: { type: String, required: true, default: "" },
-    paymentTendered: { type: Number, required: true, default: 0 },
+    posOrderId: { type: Number, required: true },
+    orderType: { type: String, required: true },
+    paymentMethod: { type: String, required: true},
+    paymentTendered: { type: Number, required: true },
     orderDate: { type: Date, default: Date.now },
     paymentStatus: { type: String, default: "Pending" },
   },
   customer: {
-    name: { type: String, required: true, default: "" },
-    phone: { type: String, required: true, default: "" },
+    name: { type: String, required: true },
+    phone: { type: String, required: true },
   },
 });
 

@@ -107,6 +107,9 @@ module.exports = {
         item_lines,
       } = req.body;
 
+      console.log(req.body,"checkk");
+
+
       const orderDetails = item_lines.map((item) => ({
         product_name: item.product_name,
         product_quantity: item.product_quantity,

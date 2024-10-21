@@ -127,26 +127,25 @@ module.exports = {
           orderDate: orderDate,
           paymentStatus: payment_status,
         },
-
         customer: {
           name: customer_name,
           phone: customer_phone_number,
         },
       };
 
-      const orderData = {
-       whatsappOnlineOrder: [whatsappOrderData],
-      };
+      // Create a new document with WhatsApp order data
+      const newWhtssapponlineOrder = new onlineOrders({
+        whatsappOnlineOrder: [whatsappOrderData], // Store WhatsApp order in an array field
+      });
 
       // Save the order to the database
-      const order = new onlineOrders(orderData);
-      await order.save();
+      await newWhtssapponlineOrder.save();
 
       // Broadcast the new order to all WebSocket clients
       const wss = req.app.get("wss"); // Ensure WebSocket server is available
       wss.clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify(orderData));
+          client.send(JSON.stringify(whatsappOrderData));
         }
       });
 
@@ -1330,14 +1329,14 @@ module.exports = {
 
   deleteCustomerOnline: async (req, res) => {
     const { Id } = req.params;
-         
+
     try {
       // Find the document and remove the order with the specified Id from customerOnlineOrder array
-    const updatedOrder = await onlineOrders.findOneAndUpdate(
-      { "customerOnlineOrder.Id": Id }, // Find the document where the Id matches inside the array
-      { $pull: { customerOnlineOrder: { Id: Id } } }, // Pull the matching subdocument from the array
-      { new: true } // Return the updated document
-    );
+      const updatedOrder = await onlineOrders.findOneAndUpdate(
+        { "customerOnlineOrder.Id": Id }, // Find the document where the Id matches inside the array
+        { $pull: { customerOnlineOrder: { Id: Id } } }, // Pull the matching subdocument from the array
+        { new: true } // Return the updated document
+      );
 
       if (!updatedOrder) {
         return res.status(404).json({ message: "OrderNotefound" });
@@ -1359,12 +1358,9 @@ module.exports = {
     try {
       const { totalAmount, Items } = req.body;
 
-      
       const updateCustomerOrder = await onlineOrders.findOne({
         "customerOnlineOrder.Id": Id, // Search for the Id inside the array
       });
-
-   
 
       if (!updateCustomerOrder) {
         return res.status(404).json({
@@ -1384,7 +1380,8 @@ module.exports = {
       }
 
       orderToUpdate.Items = Items || updateCustomerOrder.Items;
-      orderToUpdate.totalAmount =  totalAmount || updateCustomerOrder.totalAmount;
+      orderToUpdate.totalAmount =
+        totalAmount || updateCustomerOrder.totalAmount;
 
       // Save the updated order
       await updateCustomerOrder.save();

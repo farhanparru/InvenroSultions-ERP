@@ -81,6 +81,12 @@ const customerOnlineOrderSchema = new mongoose.Schema({
     required: false,
     default: "",
   },
+
+  orderType: {  // Add this field
+    type: String,
+    required: true,
+    default: "customerOnlineOrder",
+},
 });
 
 // Schema for whatsappOnlineOrder
@@ -94,7 +100,12 @@ const whatsappOnlineOrderSchema = new mongoose.Schema({
       }
     ],
     orderMeta: {
-      posOrderId: Number,
+      posOrderId: String,
+      orderType: {
+        type: String,
+        required: true,
+        default: "whatsappOnlineOrder",
+    },
       orderType: String,
       paymentMethod: String,
       paymentTendered: Number,

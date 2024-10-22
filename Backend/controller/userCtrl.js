@@ -93,71 +93,149 @@ module.exports = {
     }
   },
 
-  // Webhook endpoint to handle incoming orders
-  whatsAPPonlineOrder: async (req, res) => {
+  // OnlinePlatfromOrders
+
+  processOrder: async (req, res) => {
     try {
-      const {
-        order_id,
-        catalog_id,
-        payment_method,
-        cart_total,
-        customer_name,
-        customer_phone_number,
-        payment_status,
-        item_lines,
-      } = req.body;
+      const { OrderType, ...orderData } = req.body;
 
-      console.log(req.body,"checkk");
+      if (OrderType === "customerOnlineOrder") {
+        // Process Customer Online Order
+        const {
+          Items,
+          Id,
+          OnlineorderDate,
+          totalAmount,
+          orderStatus,
+          customerName,
+          customerPhone,
+          orderNotes,
+        } = orderData;  // Make sure these values exist
+        
+        const customerOrderData = {
+          Items,
+          Id,
+          OnlineorderDate,
+          totalAmount,
+          orderStatus,
+          customerName,
+          customerPhone,
+          orderNotes,
+        };
 
-
-      const orderDetails = item_lines.map((item) => ({
-        product_name: item.product_name,
-        product_quantity: item.product_quantity,
-        product_currency: item.product_currency,
-        unit_price: item.unit_price,
-      }));
-
-      // Convert current date and time to IST
-      const orderDate = moment().tz("Asia/Kolkata").format();
-
-      const whatsappOrderData = {
-        orderDetails: orderDetails,
-        orderMeta: {
-          posOrderId: order_id,
-          orderType: catalog_id,
-          paymentMethod: payment_method,
-          paymentTendered: cart_total,
-          orderDate: orderDate,
-          paymentStatus: payment_status,
-          orderStatus: "Pending", // Ensure orderStatus is set to Pending
-        },
-        customer: {
-          name: customer_name,
-          phone: customer_phone_number,
-        },
-      };
-
-      // Create a new document with WhatsApp order data
-      const newWhtssapponlineOrder = new onlineOrders({
-        whatsappOnlineOrder: [whatsappOrderData], 
-      });
-
-    
-      await newWhtssapponlineOrder.save();
-
-   
-      const wss = req.app.get("wss");
-      wss.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify(whatsappOrderData));
-        }
+        const newCustomerOnlineOrder = new onlineOrders({
+          customerOnlineOrder: [customerOrderData], // Wrap in an array if you expect multiple orders
+          orderType: "customerOnlineOrder",
       });
 
 
-      res.status(200).send("WhatsApp Order Successfully Processed");
+        await newCustomerOnlineOrder.save();
+
+        // Broadcast to WebSocket clients
+        const wss = req.app.get("wss");
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(newCustomerOnlineOrder));
+          } 
+        });
+
+        return res.status(201).json({
+          message: "Customer Online Order created successfully",
+          order: newCustomerOnlineOrder,
+        });
+
+      }else if (OrderType === "whatsappOnlineOrder"){
+        // Process WhatsApp Online Order
+        const {
+          order_id,
+          catalog_id,
+          payment_method,
+          cart_total,
+          customer_name,
+          customer_phone_number,
+          payment_status,
+          item_lines,
+        } = orderData;  // Make sure these values exist
+        
+        // // Logging received data
+        // console.log("WhatsApp Order Data:", {
+        //   order_id,
+        //   catalog_id,
+        //   payment_method,
+        //   cart_total,
+        //   customer_name,
+        //   customer_phone_number,
+        //   payment_status,
+        //   item_lines,
+        // });
+        
+
+
+        // Map the item_lines to orderDetails
+        const orderDetails = item_lines.map((item) => ({
+          product_name: item.product_name,
+          product_quantity: item.product_quantity,
+          product_currency: item.product_currency,
+          unit_price: item.unit_price,
+        }));
+
+        
+
+        // Convert current date and time to IST
+        const orderDate = moment().tz("Asia/Kolkata").format();
+
+        const whatsappOrderData = {
+          orderDetails: orderDetails,
+          orderMeta: {
+            posOrderId: order_id, // This is a string
+            orderType: catalog_id,
+            paymentMethod: payment_method,
+            paymentTendered: cart_total, // Make sure this is a number
+            orderDate: orderDate,
+            paymentStatus: payment_status,
+            orderStatus: "Pending",
+          },
+          customer: {
+            name: customer_name,
+            phone: customer_phone_number,
+          },
+        };
+        
+        console.log("WhatsApp Order Data:", whatsappOrderData);
+
+
+      const newWhatsAppOrder = new onlineOrders({
+        whatsappOnlineOrder: [whatsappOrderData], // Wrap in an array if you expect multiple orders
+        orderType: "whatsappOnlineOrder",
+      });
+      
+      
+      console.log(newWhatsAppOrder,"newWhatsAppOrder");
+      
+
+    await newWhatsAppOrder.save();
+
+
+        // Broadcast to WebSocket clients
+        const wss = req.app.get("wss");
+        wss.clients.forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(JSON.stringify(whatsappOrderData));
+          }
+        });
+
+        return res.status(200).json({
+          message: "WhatsApp Order processed successfully",
+          order: whatsappOrderData,
+        }); 
+      }else{
+        return res.status(400).json({
+          message: "Invalid OrderType. Expected 'AppOrder' or 'whtsappOrder'.",
+        });
+      }
     } catch (error) {
-      console.error("Error processing order:", error);
-      res.status(500).send("Internal Server Error");
+       console.log(error);
+       
     }
   },
 
@@ -1257,58 +1335,6 @@ module.exports = {
   },
 
   // CustomerOnlineorder
-
-  customerOnlineorder: async (req, res) => {
-    try {
-      const {
-        Items,
-        Id,
-        OnlineorderDate,
-        totalAmount,
-        orderStatus,
-        customerName,
-        customerPhone,
-        orderNotes,
-      } = req.body;
-
-      // Construct customerOnlineOrder data
-      const customerOrderData = {
-        Items,
-        Id,
-        OnlineorderDate,
-        totalAmount,
-        orderStatus,
-        customerName,
-        customerPhone,
-        orderNotes,
-      };
-
-      // Create new Document with the customerOnlineOrder array
-      const newCustomeronlineOrder = new onlineOrders({
-        customerOnlineOrder: [customerOrderData], // Store customer order in an array field
-      });
-
-      // Save the new order to the database
-      await newCustomeronlineOrder.save();
-
-      // Broadcast the new order to all WebSocket clients
-      const wss = req.app.get("wss"); // Ensure WebSocket server is available
-      wss.clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify(newCustomeronlineOrder));
-        }
-      });
-
-      // Send success response
-      return res.status(201).json({
-        message: "Customer order created successfully",
-        order: newCustomeronlineOrder,
-      });
-    } catch (error) {
-      console.error("Error creating order:", error);
-      return res.status(500).json({ message: "Internal server error" });
-    }
-  },
 
   getCustomerOrder: async (req, res) => {
     try {

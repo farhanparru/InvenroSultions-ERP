@@ -11,16 +11,13 @@ router.post('/Posorder', userCtrl.PosOrder);
 router.get('/PosOrder', userCtrl.getOrders);
 
 
-// Whatssapp Orders intgrate XpressBot
-router.post('/WhatsappOrder', userCtrl.whatsAPPonlineOrder);
+// Online Platform Oders
+
+router.post('/OnlineOrder', userCtrl.processOrder)
 router.get('/Whatsappget', userCtrl.fetchOnlineOrder)
 router.put('/orders/:id/status',userCtrl.statusUpdate)
 router.patch('/PaymentStatus/:id', userCtrl.paymentStatus);
 
-
-
-//CustomerOnline APPlication Orders 
-router.post('/customerOnline',userCtrl.customerOnlineorder)
 router.patch('/CustomerStatus/:id', userCtrl.StatusChange);
 router.get('/getOnlineorder', userCtrl.getCustomerOrder)
 router.delete('/deleteCustomer/:Id', userCtrl.deleteCustomerOnline)

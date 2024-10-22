@@ -86,25 +86,25 @@ const customerOnlineOrderSchema = new mongoose.Schema({
 // Schema for whatsappOnlineOrder
 const whatsappOnlineOrderSchema = new mongoose.Schema({
   orderDetails: [
-    {
-      product_name: { type: String, required: true},
-      product_quantity: { type: Number, required: true },
-      product_currency: { type: String, required: true },
-      unit_price: { type: Number, required: true },
+      {
+        product_name: String,
+        product_quantity: Number,
+        product_currency: String,
+        unit_price: Number,  // Unit price added here
+      }
+    ],
+    orderMeta: {
+      posOrderId: Number,
+      orderType: String,
+      paymentMethod: String,
+      paymentTendered: Number,
+      orderDate: Date, 
+      paymentStatus: { type: String, default: 'Pending' },
     },
-  ],
-  orderMeta: {
-    posOrderId: { type: Number, required: true },
-    orderType: { type: String, required: true },
-    paymentMethod: { type: String, required: true},
-    paymentTendered: { type: Number, required: true },
-    orderDate: { type: Date, default: Date.now },
-    paymentStatus: { type: String, default: "Pending" },
-  },
-  customer: {
-    name: { type: String, required: true },
-    phone: { type: String, required: true },
-  },
+    customer: {
+      name: String,
+      phone: String,
+    },
 });
 
 // Main schema combining both arrays

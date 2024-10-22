@@ -129,6 +129,7 @@ module.exports = {
           paymentTendered: cart_total,
           orderDate: orderDate,
           paymentStatus: payment_status,
+          orderStatus: "Pending", // Ensure orderStatus is set to Pending
         },
         customer: {
           name: customer_name,

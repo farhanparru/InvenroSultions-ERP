@@ -945,7 +945,7 @@ const HomeOrdersSection = () => {
   const sortOrdersByPosOrderId = (orders) => {
     return orders
       .slice()
-      .sort((a, b) => b.orderMeta?.posOrderId - a.orderMeta.posOrderId);
+      .sort((a, b) => b.orderMeta?.posOrderId - a.orderMeta?.posOrderId);
   };
 
   // Sort orders whenever the orders prop changes

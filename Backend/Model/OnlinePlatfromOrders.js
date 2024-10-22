@@ -100,6 +100,7 @@ const whatsappOnlineOrderSchema = new mongoose.Schema({
       paymentTendered: Number,
       orderDate: Date, 
       paymentStatus: { type: String, default: 'Pending' },
+      orderStatus: { type: String, default: 'Pending' },   // Order status defaults to Pending
     },
     customer: {
       name: String,

@@ -4,12 +4,12 @@ const EmployeSchema = require("../Model/Employemodel");
 const Customer = require("../Model/Customermodel");
 const Floor = require("../Model/Floormodel");
 const Table = require("../Model/Hometablemodel");
+const overALLItems = require('../Model/ALLItemsmodel')
 const Waiter = require("../Model/Waiterodermodel");
-const AddToSheetItem = require("../Model/catlogItemModel");
 const TaxItem = require("../Model/ItemTaxmodel");
 const ItemDevices = require("../Model/DeviceModel");
 const Admin = require("../Model/Signupmodel");
-const POSItems = require("../Model/PosItemsmodel");
+const POSItems = require("../Model/ALLItemsmodel");
 const onlineOrders = require("../Model/OnlinePlatfromOrders");
 const WebSocket = require("ws");
 const jwt = require("jsonwebtoken");
@@ -19,7 +19,6 @@ const moment = require("moment-timezone");
 const cloudinary = require("cloudinary").v2;
 const multer = require("multer");
 const path = require("path");
-const ExcelSheetData = require("../Model/ItemsModal");
 const XLSX = require("xlsx");
 const mongoose = require("mongoose");
 require("dotenv").config();
@@ -110,6 +109,7 @@ module.exports = {
           customerName,
           customerPhone,
           orderNotes,
+          OrderType
         } = orderData;  // Make sure these values exist
         
         const customerOrderData = {
@@ -121,6 +121,7 @@ module.exports = {
           customerName,
           customerPhone,
           orderNotes,
+          OrderType
         };
 
         const newCustomerOnlineOrder = new onlineOrders({
@@ -155,6 +156,7 @@ module.exports = {
           customer_phone_number,
           payment_status,
           item_lines,
+          OrderType
         } = orderData;  // Make sure these values exist
         
         // // Logging received data
@@ -186,6 +188,7 @@ module.exports = {
 
         const whatsappOrderData = {
           orderDetails: orderDetails,
+          OrderType:OrderType,
           orderMeta: {
             posOrderId: order_id, // This is a string
             orderType: catalog_id,
@@ -209,8 +212,7 @@ module.exports = {
         orderType: "whatsappOnlineOrder",
       });
       
-      
-      console.log(newWhatsAppOrder,"newWhatsAppOrder");
+ 
       
 
     await newWhatsAppOrder.save();
@@ -239,22 +241,22 @@ module.exports = {
     }
   },
 
-  // Fetch WhatssappOnlineOrders  Endpoint
+  // Fetch OnlineOrders  Endpoint
 
   fetchOnlineOrder: async (req, res) => {
     try {
-      const WhatssappOnlineOrders = await onlineOrders.find(
+      const Orders = await onlineOrders.find(
         {},
-        { whatsappOnlineOrder: 1 }
+        { customerOnlineOrder: 1, whatsappOnlineOrder: 1 }  // Include both order types in the query
       );
 
-      if (!WhatssappOnlineOrders.length) {
+      if (!Orders.length) {
         return res
           .status(404)
           .json({ message: "No Whatsapp online orders found." });
       }
 
-      return res.status(200).json(WhatssappOnlineOrders);
+      return res.status(200).json( Orders);
     } catch (error) {
       console.error("Error fetching orders:", error);
       res.status(500).json({ message: "Error fetching orders", error });
@@ -373,68 +375,8 @@ module.exports = {
     }
   },
 
-  // whtsapp Online Orders payment status
-  statusUpdate: async (req, res) => {
-    const { status } = req.body;
-
-    try {
-      const order = await onlineOrders.findByIdAndUpdate(
-        req.params.id,
-        { paymentStatus: status },
-        { new: true } // Return the updated order
-      );
-
-      if (!order) {
-        return res.status(404).send("Order not found");
-      }
-
-      res.send(order); // Send back the updated order
-    } catch (error) {
-      console.error(error);
-      res.status(500).send("Server error");
-    }
-  },
-
-  // paymentStatus update
-
-  paymentStatus: async (req, res) => {
-    const { id } = req.params;
-    const { status } = req.body;
-    try {
-      // Validate the status if necessary
-      const validStatuses = [
-        "Pending",
-        "Accepted",
-        "Ready",
-        "Assigned",
-        "Completed",
-        "Rejected",
-        "Cancelled",
-      ];
-      if (!validStatuses.includes(status)) {
-        return res.status(400).json({ message: "Invalid status" });
-      }
-
-      // Update the payment status in the database
-      const updatedOrder = await onlineOrders.findByIdAndUpdate(
-        id,
-        { "orderMeta.paymentStatus": status },
-        { new: true }
-      );
-
-      if (!updatedOrder) {
-        return res.status(404).json({ message: "Order not found" });
-      }
-
-      res.status(200).json(updatedOrder);
-      console.log(updatedOrder, "updatedOrder");
-    } catch (error) {
-      console.log(error);
-
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-  },
-
+  
+ 
   // CustomerOnlineOrderStatus change
 
   StatusChange: async (req, res) => {
@@ -474,7 +416,7 @@ module.exports = {
 
       // Save the updated order
       await Order.save();
-      // Return success response
+     
       res
         .status(200)
         .json({ message: "Order status updated successfully!", Order });
@@ -485,6 +427,12 @@ module.exports = {
         .json({ message: "Error updating order status", error: error.message });
     }
   },
+
+
+
+
+
+
 
   // ExcelSheet datas
 
@@ -497,9 +445,11 @@ module.exports = {
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const data = XLSX.utils.sheet_to_json(worksheet);
 
+      console.log(data);
+      
       // Save data to database
       for (const item of data) {
-        await ExcelSheetData.create(item);
+        await overALLItems.create(item);
       }
 
       res.status(200).send("File processed and data saved.");
@@ -511,9 +461,9 @@ module.exports = {
 
   // getExcelSheet datas
 
-  SheetDataGet: async (req, res) => {
+  ALLItemsGet: async (req, res) => {
     try {
-      const items = await ExcelSheetData.find();
+      const items = await overALLItems.find();
       res.status(200).json(items);
     } catch (error) {
       console.error(error);
@@ -743,6 +693,8 @@ module.exports = {
     }
   },
 
+
+
   // Google Sheet Webhook URL
 
   addSheetItem: async (req, res) => {
@@ -756,7 +708,7 @@ module.exports = {
         cb(null, "uploads/"); // Set your destination folder
       },
       filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname)); // Add timestamp to file name to avoid duplicates
+        cb(null, Date.now() + path.extname(file.originalname)); 
       },
     });
 
@@ -772,7 +724,7 @@ module.exports = {
         const imageFile = req.file;
         let imageLink = "";
 
-        // Extract fields from the request body after multer processes the request
+       
         const {
           id,
           title,
@@ -1336,25 +1288,6 @@ module.exports = {
 
   // CustomerOnlineorder
 
-  getCustomerOrder: async (req, res) => {
-    try {
-      const customerOnlineOrders = await onlineOrders.find(
-        {},
-        { customerOnlineOrder: 1 }
-      );
-
-      if (!customerOnlineOrders.length) {
-        return res
-          .status(404)
-          .json({ message: "No customer online orders found." });
-      }
-
-      return res.status(200).json(customerOnlineOrders);
-    } catch (error) {
-      console.error("Error retrieving orders:", error.message);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  },
 
   // deleteCustomerOnlineAll
 
@@ -1362,11 +1295,11 @@ module.exports = {
     const { Id } = req.params;
 
     try {
-      // Find the document and remove the order with the specified Id from customerOnlineOrder array
+     
       const updatedOrder = await onlineOrders.findOneAndUpdate(
-        { "customerOnlineOrder.Id": Id }, // Find the document where the Id matches inside the array
-        { $pull: { customerOnlineOrder: { Id: Id } } }, // Pull the matching subdocument from the array
-        { new: true } // Return the updated document
+        { "customerOnlineOrder.Id": Id },
+        { $pull: { customerOnlineOrder: { Id: Id } } },
+        { new: true } 
       );
 
       if (!updatedOrder) {
@@ -1411,15 +1344,12 @@ module.exports = {
       }
 
       orderToUpdate.Items = Items || updateCustomerOrder.Items;
-      orderToUpdate.totalAmount =
-        totalAmount || updateCustomerOrder.totalAmount;
+      orderToUpdate.totalAmount = totalAmount || updateCustomerOrder.totalAmount;
 
       // Save the updated order
       await updateCustomerOrder.save();
 
-      // Log the result for debugging
-      console.log(updateCustomerOrder.Items, "Updated Items");
-
+     
       // Send a success response
       res.status(200).json({
         message: "Online CustomerOrder updated successfully",
@@ -1429,6 +1359,9 @@ module.exports = {
       console.log(error);
     }
   },
+
+
+
 
   //Tax created
 

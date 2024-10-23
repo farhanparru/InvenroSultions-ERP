@@ -11,16 +11,12 @@ router.post('/Posorder', userCtrl.PosOrder);
 router.get('/PosOrder', userCtrl.getOrders);
 
 
+
 // Online Platform Oders
-
 router.post('/OnlineOrder', userCtrl.processOrder)
-router.get('/Whatsappget', userCtrl.fetchOnlineOrder)
-router.put('/orders/:id/status',userCtrl.statusUpdate)
-router.patch('/PaymentStatus/:id', userCtrl.paymentStatus);
-
+router.get('/OnlineOrderget', userCtrl.fetchOnlineOrder)
 router.patch('/CustomerStatus/:id', userCtrl.StatusChange);
-router.get('/getOnlineorder', userCtrl.getCustomerOrder)
-router.delete('/deleteCustomer/:Id', userCtrl.deleteCustomerOnline)
+router.delete('/deleteOnlineOrder/:Id', userCtrl.deleteCustomerOnline)
 router.put('/EditOrders/:Id', userCtrl.CustomerOnlineItemsEdit)
 
 
@@ -62,10 +58,13 @@ router.put('/EditDevices/:DeviceId',userCtrl.EditDevices)
 
 
 // Aditional Servicess Like Excel
-router.post('/importexcel', upload.single('file'),userCtrl.ImportExcel);
-router.get('/ExcelItems',userCtrl.SheetDataGet) 
+router.post('/Importexcel', upload.single('file'),userCtrl.ImportExcel);
+router.get('/ExcelItems',userCtrl. ALLItemsGet) 
 router.post('/addItem',userCtrl.addSheetItem)
 
+
+// Create POS frondent Items
+router.post("/createPosItem/:deviceId", userCtrl.POSItem);
 
 
 
@@ -93,9 +92,6 @@ router.post('/:floorId/createTable',userCtrl.createTable)
 router.get('/:floorId/getTables', userCtrl.getTablesByFloor);
 router.get('/getAllTables',userCtrl.getAllTables)
 
-
-// Create POS frondent Items
-router.post("/createPosItem/:deviceId", userCtrl.POSItem);
 
 
 

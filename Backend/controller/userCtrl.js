@@ -4,7 +4,9 @@ const EmployeSchema = require("../Model/Employemodel");
 const Customer = require("../Model/Customermodel");
 const Floor = require("../Model/Floormodel");
 const Table = require("../Model/Hometablemodel");
-const overALLItems = require('../Model/ALLItemsmodel')
+
+const { Melparamba, Theruvath, Nayamaramoola } = require("../Model/ALLItemsmodel"); // Adjust the path accordingly
+
 const Waiter = require("../Model/Waiterodermodel");
 const TaxItem = require("../Model/ItemTaxmodel");
 const ItemDevices = require("../Model/DeviceModel");
@@ -446,10 +448,27 @@ module.exports = {
       const data = XLSX.utils.sheet_to_json(worksheet);
 
       console.log(data);
+
+      let model;
+      switch (req.originalUrl) {
+        case '/Importexcel/Melparamba':
+          model = Melparamba;
+          break;
+        case '/Importexcel/theruvath':
+          model = Theruvath;
+          break;
+        case '/Importexcel/nayamaramoola':
+          model = Nayamaramoola;
+          break;
+        default:
+          return res.status(400).send("Invalid endpoint.");
+      }
+
+
       
       // Save data to database
       for (const item of data) {
-        await overALLItems.create(item);
+        await model.create(item);
       }
 
       res.status(200).send("File processed and data saved.");
@@ -458,6 +477,8 @@ module.exports = {
       res.status(500).send("Error processing file.");
     }
   },
+
+
 
   // getExcelSheet datas
 

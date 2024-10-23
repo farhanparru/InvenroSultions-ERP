@@ -91,6 +91,12 @@ const AllItemsSchema = new mongoose.Schema(
       enum: ["new", "used", "refurbished"],
       required: false,
     },
+ 
+    location:{
+      type:String,
+      required: true,
+    },
+
     brand: {
       type: String,
       required: false, // Set this to true if you want it to be mandatory
@@ -111,8 +117,14 @@ const AllItemsSchema = new mongoose.Schema(
   {}
 );
 
-
+// Create indexes
 AllItemsSchema.index({ price: 1 });
-AllItemsSchema.index({ itemCode: 1 });
+AllItemsSchema.index({ id: 1 }); // Updated to match your schema property
+``
 
-module.exports = mongoose.model("OverAllItems",  AllItemsSchema);
+// Export models for different collections
+const Melparamba = mongoose.model("Melparamba", AllItemsSchema);
+const Theruvath = mongoose.model("Theruvath", AllItemsSchema);
+const Nayamaramoola = mongoose.model("Nayamaramoola", AllItemsSchema);
+
+module.exports = { Melparamba, Theruvath, Nayamaramoola };

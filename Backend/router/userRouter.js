@@ -57,15 +57,16 @@ router.put('/EditDevices/:DeviceId',userCtrl.EditDevices)
 
 
 
-// Aditional Servicess Like Excel
+// Aditional Servicess Like Excel google catelog sheet
 router.post('/Importexcel/Melparamba', upload.single('file'),userCtrl.ImportExcel);
 router.post('/Importexcel/Naimarmoola', upload.single('file'),userCtrl.ImportExcel);
 router.post('/Importexcel/Theruvath', upload.single('file'),userCtrl.ImportExcel);
 
+router.get('/getExcel/Melparamba',userCtrl.ExcelItemsGet) 
+router.get('/getExcel/theruvath',userCtrl.ExcelItemsGet) 
+router.get('/getExcel/nayamaramoola',userCtrl.ExcelItemsGet) 
 
-router.get('/ExcelItems',userCtrl. ALLItemsGet) 
-router.post('/addItem',userCtrl.addSheetItem)
-// Create POS frondent Items
+
 router.post("/createPosItem/:deviceId", userCtrl.POSItem);
 
 

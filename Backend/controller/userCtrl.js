@@ -446,18 +446,18 @@ module.exports = {
       const workbook = XLSX.readFile(req.file.path);
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const data = XLSX.utils.sheet_to_json(worksheet);
-
+      
       console.log(data);
 
       let model;
       switch (req.originalUrl) {
-        case '/Importexcel/Melparamba':
+        case '/api/admin/Importexcel/Melparamba':
           model = Melparamba;
           break;
-        case '/Importexcel/theruvath':
+        case '/api/admin/Importexcel/theruvath':
           model = Theruvath;
           break;
-        case '/Importexcel/nayamaramoola':
+        case '/api/admin/Importexcel/nayamaramoola':
           model = Nayamaramoola;
           break;
         default:
@@ -482,15 +482,33 @@ module.exports = {
 
   // getExcelSheet datas
 
-  ALLItemsGet: async (req, res) => {
+  ExcelItemsGet: async (req, res) => {
     try {
-      const items = await overALLItems.find();
+      let model;
+      switch (req.originalUrl) {
+        case '/api/admin/getExcel/Melparamba':
+          model = Melparamba;
+          break;
+        case '/api/admin/getExcel/theruvath':
+          model = Theruvath;
+          break;
+        case '/api/admin/getExcel/nayamaramoola':
+          model = Nayamaramoola;
+          break;
+        default:
+          return res.status(400).send("Invalid endpoint.");
+      }
+  
+      // Fetch items from the appropriate model
+      const items = await model.find();
       res.status(200).json(items);
     } catch (error) {
       console.error(error);
       res.status(500).send("Error retrieving items.");
     }
   },
+
+
 
   // Employe create
   createEmploye: async (req, res) => {
@@ -716,111 +734,7 @@ module.exports = {
 
 
 
-  // Google Sheet Webhook URL
-
-  addSheetItem: async (req, res) => {
-    // Google Sheet Webhook URL
-    const googleSheetWebhookURL =
-      "https://script.google.com/macros/s/AKfycbxQSe8f6i3ifmgC7oepM72UQC90gLkehtnjrvYFFzbHAzw_MPk-5dwFBuhqsh69JfjOGg/exec?gid=0";
-
-    // Multer configuration for image uploads
-    const storage = multer.diskStorage({
-      destination: (req, file, cb) => {
-        cb(null, "uploads/"); // Set your destination folder
-      },
-      filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname)); 
-      },
-    });
-
-    const upload = multer({ storage }).single("imageFile"); // Assuming the image is uploaded with 'imageFile' key
-
-    try {
-      // Upload the image via multer
-      upload(req, res, async function (err) {
-        if (err) {
-          return res.status(400).json({ error: "Image upload failed", err });
-        }
-
-        const imageFile = req.file;
-        let imageLink = "";
-
-       
-        const {
-          id,
-          title,
-          description,
-          availability,
-          condition,
-          price,
-          link,
-          brand,
-        } = req.body;
-
-        // Log the request body and uploaded file
-        console.log("Request body:", req.body);
-        console.log("Uploaded file:", req.file);
-
-        // Validate required fields
-        if (!title || !description || !availability || !condition || !price) {
-          return res.status(400).json({
-            error:
-              "All required fields (title, description, availability, condition, price) must be provided.",
-          });
-        }
-
-        // Generate unique id if not provided
-        const uniqueId = id || new mongoose.Types.ObjectId().toString();
-
-        // Step 1: Upload image to Cloudinary if it exists
-        if (imageFile) {
-          const result = await cloudinary.uploader.upload(imageFile.path);
-          imageLink = result.secure_url; // Secure URL returned from Cloudinary
-        }
-
-        // Step 2: Save the data to MongoDB
-        const newItem = new AddToSheetItem({
-          id: uniqueId,
-          title,
-          description,
-          availability,
-          condition,
-          price,
-          link,
-          brand,
-          image_link: imageLink,
-        });
-
-        await newItem.save();
-
-        // Step 3: Send data to Google Sheets using the webhook URL
-        await axios.post(googleSheetWebhookURL, {
-          id: uniqueId,
-          title,
-          description,
-          availability,
-          condition,
-          price,
-          link,
-          brand,
-          image_link: imageLink, // The image link from Cloudinary
-        });
-
-        // Respond with success
-        res.status(201).json({
-          message: "Item successfully added to the database and Google Sheet!",
-          id: uniqueId,
-          image_link: imageLink,
-        });
-      });
-    } catch (error) {
-      console.error("Error adding item: ", error);
-      res.status(500).json({
-        error: "Failed to add item to the database or Google Sheet.",
-      });
-    }
-  },
-
+ 
   // POSItemscreate
 
   POSItem: async (req, res) => {
@@ -889,6 +803,10 @@ module.exports = {
       res.status(500).json({ msg: "Server Error" });
     }
   },
+
+
+
+
 
   // getPosItemsAll
 

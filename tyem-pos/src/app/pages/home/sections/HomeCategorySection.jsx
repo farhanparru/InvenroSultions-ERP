@@ -20,10 +20,13 @@ const HomeCategorySection = ({ onCategorySelect }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/user/ExcelItems');
+        const response = await fetch('http://localhost:8000/api/admin/getExcel/Melparamba');
+        console.log( response," uniqueCategories");
         const data = await response.json();
 
         const uniqueCategories = [...new Set(data.map(item => item.category))];
+        console.log( uniqueCategories," uniqueCategories");
+        
         setCategories(uniqueCategories);
       } catch (error) {
         console.error('Error fetching categories:', error);

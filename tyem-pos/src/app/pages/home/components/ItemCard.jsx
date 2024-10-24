@@ -18,7 +18,7 @@ const ItemCard = React.memo(({ selectedCategory }) => {
     const fetchItems = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/user/ExcelItems"
+          "http://localhost:8000/api/admin/getExcel/Melparamba"
         );
         const fetchedItems = response.data;
 
@@ -94,11 +94,11 @@ const ItemCard = React.memo(({ selectedCategory }) => {
             style={{ width: "180px", height: "120px" }}
           >
             <h3 className="text-sm font-bold capitalize line-clamp-2">
-              {item.ItemName}
+              {item.title}
             </h3>
 
             <h3 className="text-md font-medium mt-1">
-              ₹{parseFloat(item.Price).toFixed(2)}
+              ₹{parseFloat(item.price).toFixed(2)}
             </h3>
           </div>
         ))}
@@ -112,11 +112,11 @@ const ItemCard = React.memo(({ selectedCategory }) => {
             style={{ width: "180px", height: "120px" }}
           >
             <h3 className="text-sm font-bold capitalize line-clamp-2">
-              {item.ItemName}
+              {item.title}
             </h3>
 
             <h3 className="text-md font-medium mt-1">
-              ₹{parseFloat(item.Price).toFixed(2)}
+              ₹{parseFloat(item.price).toFixed(2)}
             </h3>
           </div>
         ))}
@@ -130,11 +130,11 @@ const ItemCard = React.memo(({ selectedCategory }) => {
             style={{ width: "180px", height: "120px" }}
           >
             <h3 className="text-sm font-bold capitalize line-clamp-2">
-              {item.ItemName}
+              {item.title}
             </h3>
 
             <h3 className="text-md font-medium mt-1">
-              ₹{parseFloat(item.Price).toFixed(2)}
+              ₹{parseFloat(item.price).toFixed(2)}
             </h3>
           </div>
         ))}
@@ -148,11 +148,11 @@ const ItemCard = React.memo(({ selectedCategory }) => {
             style={{ width: "180px", height: "120px" }}
           >
             <h3 className="text-sm font-bold capitalize line-clamp-2">
-              {item.ItemName}
+              {item.title}
             </h3>
 
             <h3 className="text-md font-medium mt-1">
-              ₹{parseFloat(item.Price).toFixed(2)}
+              ₹{parseFloat(item.price).toFixed(2)}
             </h3>
           </div>
         ))}

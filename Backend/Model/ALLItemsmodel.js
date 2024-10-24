@@ -120,7 +120,7 @@ const AllItemsSchema = new mongoose.Schema(
 // Create indexes
 AllItemsSchema.index({ price: 1 });
 AllItemsSchema.index({ id: 1 }); // Updated to match your schema property
-``
+
 
 // Export models for different collections
 const Melparamba = mongoose.model("Melparamba", AllItemsSchema);

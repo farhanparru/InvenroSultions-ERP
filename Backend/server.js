@@ -11,7 +11,7 @@ const {Server} = require('ws');
 
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: ['http://localhost:5173','http://localhost:3000'],
     methods: "GET,POST,PUT,DELETE,PATCH",
     credentials: true,  // This allows credentials to be included in the request
     allowedHeaders: ["Content-Type", "Authorization"],
